@@ -116,7 +116,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <!--/radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-resource-manifest">
-  {"type":"character","attributes":{},"value":["dataviz-makeover-1_files/anchor-4.2.2/anchor.min.js","dataviz-makeover-1_files/bowser-1.9.3/bowser.min.js","dataviz-makeover-1_files/distill-2.2.21/template.v2.js","dataviz-makeover-1_files/header-attrs-2.7/header-attrs.js","dataviz-makeover-1_files/jquery-1.11.3/jquery.min.js","dataviz-makeover-1_files/popper-2.6.0/popper.min.js","dataviz-makeover-1_files/tippy-6.2.7/tippy-bundle.umd.min.js","dataviz-makeover-1_files/tippy-6.2.7/tippy-light-border.css","dataviz-makeover-1_files/tippy-6.2.7/tippy.css","dataviz-makeover-1_files/tippy-6.2.7/tippy.umd.min.js","dataviz-makeover-1_files/webcomponents-2.0.0/webcomponents.js","img/img01.png"]}
+  {"type":"character","attributes":{},"value":["dataviz-makeover-1_files/anchor-4.2.2/anchor.min.js","dataviz-makeover-1_files/bowser-1.9.3/bowser.min.js","dataviz-makeover-1_files/distill-2.2.21/template.v2.js","dataviz-makeover-1_files/header-attrs-2.7/header-attrs.js","dataviz-makeover-1_files/jquery-1.11.3/jquery.min.js","dataviz-makeover-1_files/popper-2.6.0/popper.min.js","dataviz-makeover-1_files/tippy-6.2.7/tippy-bundle.umd.min.js","dataviz-makeover-1_files/tippy-6.2.7/tippy-light-border.css","dataviz-makeover-1_files/tippy-6.2.7/tippy.css","dataviz-makeover-1_files/tippy-6.2.7/tippy.umd.min.js","dataviz-makeover-1_files/webcomponents-2.0.0/webcomponents.js","img/img01.png","img/img02.png","img/img03.png","img/img04.png","img/img05.png","img/img06.png","img/img07.png","img/img08.png","img/img09.png","img/img10.png","img/img11.png","img/img12.png","img/img13.png","img/img14.png","img/img15.png","img/img16.png","img/img17.png","img/img18.png","img/img19.png","img/img20.png","img/img21.png"]}
   </script>
   <!--radix_placeholder_navigation_in_header-->
 <meta name="distill:offset" content="../.."/>
@@ -2143,8 +2143,9 @@ document.addEventListener('DOMContentLoaded', function() {
 </ol>
 <h1 id="proposed-visualization">3.0 Proposed Visualization</h1>
 <p>插入修改后的图片</p>
-<p>The link to the original dashboard on Tableau Public Server can be found <a href="https://yiheen-boey-dataviz.netlify.app/posts/2021-01-26-dataviz-makeover-1/#the-improved-data-visualization">here</a>.</p>
+<p>The link to the original dashboard on Tableau Public Server can be found <a href="https://public.tableau.com/app/profile/liu.yangguang/viz/A1_16222220286090/Dashboard2">here</a>.</p>
 <h1 id="step-by-step-preparation">4.0 Step-by-step Preparation</h1>
+<p>The original data is from Department of Statistics in Singapore, available under the sub-section of <a href="https://www.singstat.gov.sg/find-data/search-by-theme/trade-and-investment/merchandise-trade/latest-data">Merchandise Trade by Region/Market</a>.</p>
 <table>
 <colgroup>
 <col style="width: 7%" />
@@ -2161,13 +2162,103 @@ document.addEventListener('DOMContentLoaded', function() {
 <tbody>
 <tr class="odd">
 <td>1</td>
-<td>Cell 2</td>
-<td>test</td>
+<td>Import the data into Tableau and click “Cleaned with Data Interpreter” to get the cleaned table</td>
+<td><img src="img/img02.png" style="width:100.0%" /></td>
 </tr>
 <tr class="even">
 <td>2</td>
-<td>Select only the top table for each data set and paste into a new sheet using Microsoft Excel</td>
-<td><img src="img/img01.png" style="width:100.0%" /></td>
+<td>Drag and drop T1 sheet to the canvas area</td>
+<td><img src="img/img03.png" style="width:100.0%" /></td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Select all the date variables, right click and choose the pivot to make date variables into one</td>
+<td><img src="img/img04.png" style="width:100.0%" /></td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Choose the T2 sheet and use the same approach to get the pivoted table</td>
+<td><img src="img/img05.png" style="width:100.0%" /></td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Right click on the “variables” and select “split” to get the cleaned region name, then rename it into “Region”</td>
+<td><img src="img/img06.png" style="width:100.0%" /></td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Hide “Variable” and “Variable - split 2” and rename the variables into meaningful name</td>
+<td><img src="img/img07.png" style="width:100.0%" /></td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Change data type of the “Date” variable from string to date in the two table</td>
+<td><img src="img/img08.png" style="width:100.0%" /></td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>Edit the connection between two tables to add one rule</td>
+<td><img src="img/img09.png" style="width:100.0%" /></td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>Add the “Date” variable into the Filters panel and select only 2019 and 2020</td>
+<td><img src="img/img10.png" style="width:100.0%" /></td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>Add the “Region” variable into the Filters panel and select the six region in the original designed visualization</td>
+<td><img src="img/img11.png" style="width:100.0%" /></td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>Add “Region” and “Date”(month) to the Columns; Add “Exports” to the Rows; Change the marks from Automatic to Area</td>
+<td><img src="img/img12.png" style="width:100.0%" /></td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>Drag the “Imports” to the left of the charts to get the dual axis</td>
+<td><img src="img/img13.png" style="width:100.0%" /></td>
+</tr>
+<tr class="odd">
+<td>13</td>
+<td>Edit the dual y axis into the same range: 0 to 8,000,000</td>
+<td><img src="img/img14.png" style="width:100.0%" /></td>
+</tr>
+<tr class="even">
+<td>14</td>
+<td>Edit the x axis into the fixed range</td>
+<td><img src="img/img15.png" style="width:100.0%" /></td>
+</tr>
+<tr class="odd">
+<td>15</td>
+<td>Right click on the “Region” and choose sort to manual sort the six regions by the total merchandise trade amount from 2019 to 2020</td>
+<td><img src="img/img16.png" style="width:100.0%" /></td>
+</tr>
+<tr class="even">
+<td>16</td>
+<td>It’s too crowded for the six graph in one columns to read the data trend: Rearrange them into two graph. Duplicate the worksheet and use filter to select the corresponding three countries in the two worksheet</td>
+<td><img src="img/img17.png" style="width:100.0%" /></td>
+</tr>
+<tr class="odd">
+<td>17</td>
+<td>Drag and drop the two worksheet to the dashboard</td>
+<td><img src="img/img18.png" style="width:100.0%" /></td>
+</tr>
+<tr class="even">
+<td>18</td>
+<td>Hide the title and the field labels in the second sheet; Hide the x header in the first sheet; Hide the “Imports” header in the two sheets</td>
+<td><img src="img/img19.png" style="width:100.0%" /></td>
+</tr>
+<tr class="odd">
+<td>19</td>
+<td>Rename the title, headers and labels for better clarity</td>
+<td><img src="img/img20.png" style="width:100.0%" /></td>
+</tr>
+<tr class="even">
+<td>20</td>
+<td>Change the font and tick color to be consistent and publish the dashboard to Tableau Public</td>
+<td><img src="img/img21.png" style="width:100.0%" /></td>
 </tr>
 </tbody>
 </table>
