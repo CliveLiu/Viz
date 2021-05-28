@@ -1,5 +1,22 @@
 [
   {
+    "path": "posts/2021-05-28-dataviz-makeover-1/",
+    "title": "DataViz Makeover 1",
+    "description": "A makeover of the data visualisation on merchandise trade in Singapore.",
+    "author": [
+      {
+        "name": "LIU Yangguang",
+        "url": "https://www.linkedin.com/in/ygliu/"
+      }
+    ],
+    "date": "2021-05-28",
+    "categories": [],
+    "contents": "\r\n\r\nContents\r\n1.0 Critique of Visualization\r\n2.0 Alternative Design\r\n3.0 Proposed Visualization\r\n4.0 Step-by-step Preparation\r\n5.0 Derived Insights\r\n\r\n1.0 Critique of Visualization\r\nThe original visualization are shown as below.\r\n\r\n1.1 Clarity\r\nThe dual axis in each chart have different ranges. It would make the reader difficult to compare the amount of import and export.\r\nThe range of y axis in the six charts are different. Reader need extra effort to compare the trade amount of different countries. They have to look at the y coordinate scales separately in the six charts to get and compare the number.\r\nThe six charts have different widths. The different width will influence the reader how to interpret the change of the amount. If the width of the same x axis in the graph is longer, the data fluctuation will seem to be smaller.\r\nThe order of the six charts is inaccurate. The title is “Top Six Trading Countries”, which makes the reader think that the six charts are ordered by trade amount of each country.\r\n1.2 Aesthetic\r\nThe x-axis scale is confusing. It is not consistent with the axis title. The title is shown as ‘Month’, but the tick marker is year. Besides, the chart of the ‘Japan’ is not the same as the x-axis markings of other countries.\r\nFont size and color are confusing. The gray color of the head’s font is consistent with the black font of other labels. Besides, the font of the country is too large, even larger than the title.\r\nThe coordinates are repeated six times. They take up so much space in the picture that the area charts are very small.\r\n2.0 Alternative Design\r\nThe proposed design is shown as bellow. 插入手写的草图\r\n2.1 Clarity\r\nThe dual axis use the same scale in the six charts. It makes it easier to compare imports and exports amounts or trade amount among countries.\r\nThe six charts have the same height and width.\r\nThe six charts are reorder by the total merchandise trade amount in the period.\r\n2.2 Aesthetic\r\nThe x axis titles are changed to the ‘Date’, consistent with the tick marks. All charts have the same axis.\r\n2.The color of all text is unified. The country fonts have been changed to smaller font sizes to highlight the captions of the images\r\nThe unnecessary axis title are hidden.\r\n3.0 Proposed Visualization\r\n插入修改后的图片\r\nThe link to the original dashboard on Tableau Public Server can be found here.\r\n4.0 Step-by-step Preparation\r\nNo.\r\nStep\r\nAction\r\n1\r\nCell 2\r\ntest\r\n2\r\nSelect only the top table for each data set and paste into a new sheet using Microsoft Excel\r\n\r\n5.0 Derived Insights\r\n\r\n\r\n\r\n",
+    "preview": {},
+    "last_modified": "2021-05-28T21:40:57+08:00",
+    "input_file": {}
+  },
+  {
     "path": "posts/2021-05-22-my-ist-post/",
     "title": "My Ist Post",
     "description": "A short description of the post.",
