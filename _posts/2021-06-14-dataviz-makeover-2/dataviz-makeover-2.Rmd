@@ -1,0 +1,141 @@
+---
+title: "dataviz-makeover-2"
+description: |
+  In this post, we present a trade data use case using Tableau. We will critique the original visualisation from clarity and aesthetic and propose an alternative design.
+author:
+  - name: LIU Yangguang
+    url: https://www.linkedin.com/in/ygliu/
+date: 06-14-2021
+output:
+  distill::distill_article:
+    self_contained: false
+    toc: true
+    toc_depth: 1
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+# 1.0 Critique of Visualization
+
+The original visualization is shown as below.
+
+![](img/img001.jfif)
+
+Source: [Department of Statistics, Singapore](https://www.singstat.gov.sg/modules/infographics/singapore-international-trade)
+
+### 1.1 Clarity
+
+1. **Improper centre point labels(white circle)**: For countries with small trade surplus(deficit), it's difficult to identify which parts the centre point of the bubble falls in. For example, readers can't tell whether the merchandise trade with Japan and EU are trade surplus or deficit. Their centre point seems to be on the dividing line of green and blue area.
+
+2. **Inconsistent conclusion**: Readers can't draw the conclusion in the blue square from the charts shown. The charts shows the trade performance with ten major partners in 2020. But the conclusion describe the trade performance for Mainland China and US from 2009 and 2006.
+
+3. **Overlap of bubbles**: The bubbles of different countries overlap each other. The green circle for Malaysia and the brown circle for Korea are almost hidden by other countries. It would be much better if the bubble are partially tranparent.
+
+4. **Incorrect axis label position**: Although readers can tell from color that the vertical axis is blue and corresponds to the blue circle symbol(Imports) at the bottom and that the horizontal axis is green and corresponds to the green symbol at the left, it's against the condition that the vertical axis label is at the left of the origin and the horizontal label is at the bottom of the origin. Exchanging the current label position can make it less misleading for readers.
+
+### 1.2 Aesthetic
+
+1. **Improper symbols of top net exporter/importer**: The circle with star and arrows sign add unnecessary complexity to the whole chart. Although they looks cute, but it requires reader to read legends for them while they only appear once. In most cases, readers can tell the top net traders approximately from the centre point of bubbles.
+
+2. **Inappropriate color for countries**: The color of bubbles can help to distinguish between countries. But the color temperature can be misleading for the importance. The red circle for Taiwan and yellow circle for Japan have high color temperature and are eye-catching while they are not the predominate in numerical variables. On the other hand,  the green circle for Malaysia and the cyan circle for Mainland China seem to be less important while they have the highest trade amount.
+
+3. **Overlap between country labels and bubbles**: Some labels for countries are not placed properly. For example, the label for US hide the centre point and a large part of the bubble for Taiwan. Instead, it could be placed at the right of the US bubble, where is less crowded. The  overlap between country labels and bubbles are distracting and prevent readers on focus on one countries.
+
+4. **No tick marks**: For continuous variables, the axis should have tick marks.
+
+# 2.0 Alternative Design
+
+The sketch of the proposed design is as follow:
+
+![](img/design.jpg)
+
+
+
+### 2.1 Clarity
+
+1. It's easier to identify net importers and net exporters by bubble color
+
+2. The 10 year trade performance is in the toolkit and add more information about each countries
+
+3. No overlapping between bubbles and labels
+
+4. Interactive select every year to show the yearly trade performance 
+
+
+### 2.2 Aesthetic
+
+1. Less notes and marks to reduce the complexity of charts
+
+2. Correct axis labels and consistent color
+
+
+# 3.0 Proposed Visualization on Tableau
+
+![](img/final.png)
+
+The link to the interactive chart on Tableau Public Server can be found [here](https://public.tableau.com/app/profile/liu.yangguang/viz/bubbleplot_16241846284400/Dashboard1).
+
+# 4.0 Step-by-step Preparation
+
+**No.** | **Step** | **Action**
+-- | ------- | ------------------- 
+1 | Import the data into Tableau and click "Cleaned with Data Interpreter" to get the cleaned table | ![](img/s1.png){width=50%}
+2 | Drag and drop T1 sheet to the canvas area | ![](img/s2.png){width=100%}
+3 | Select all the date variables, right click and choose the pivot to make date variables into one | ![](img/s3.png){width=100%}
+4 | Choose the T2 sheet and use the same approach to get the pivoted table | ![](img/s4.png){width=100%}
+5 | Right click on the date variable and change the data type from string to date in the two tables | ![](img/s5.png){width=80%}
+6 | Right click on the numerical variable and create a calculated field in the two tables to convert the value into the original number | ![](img/s6.png){width=50%} ![](img/s7.png){width=100%}![](img/s8.png){width=100%}
+7 | Right click on the market name variable and choose to split to get the cleaned market name in the two tables | ![](img/s9.png){width=100%}
+8 | Hide the useless variables: raw numerical variable, raw market name variable and the split unit variable in the two tables | ![](img/s10.png){width=100%}
+9 | Rename the date and market name variable into meaningful names | ![](img/s11.png){width=80%} ![](img/s12.png){width=80%}
+10 |  Click the line between tables in the canvas and edit the relationship in order to join them by the same date and the same market name | ![](img/s13.png){width=100%}
+11 |  In a new sheet, drag and drop *Imports* to the 'Rows', *Exports* to the 'Columns' | ![](img/s14.png){width=80%}
+12 | Drag and drop *Date2* into the Filter panel and select Year. The interested scope are only from 2011 to 2020 and choose these years only | ![](img/s15.png){width=100%}![](img/s16.png){width=80%}
+13 | Drag and drop *Market* to the Detail under the Marks panel | ![](img/s17.png){width=100%}
+14 |  Drag and drop *Market* to the Filters panel and choose the 10 major markets by entering search text | ![](img/s18.png){width=100%}
+15 |  Drag and drop *Date* into the Filter panel and select 'Year'. Right click on the new variables under Filters panel to choose 'Show Filters' | ![](img/s19.png){width=100%} ![](img/s20.png){width=50%}
+16 |  Edit the filter to only show relevant values and not to show all value. Change the style to 'Single Value (list)' | ![](img/s21.png){width=40%} ![](img/s22.png){width=70%} ![](img/s23.png){width=50%}
+17 | Create a new calculated field to get the sum of *Imports* and *Exports*. Then drag it into the 'Size' under Marks panel | ![](img/s24.png){width=100%}![](img/s25.png){width=70%}
+18 | Change the default style to 'Circle' and make the size bigger under the Marks panel | ![](img/s26.png){width=70%}
+19 | Create a new calculated field to get the trade surplus number for each year (Exports - Imports). Then drag and drop it to the 'Color' under the mark panel | ![](img/s27.png){width=100%} ![](img/s28.png){width=70%}
+20 | Edit 'Colour' under Marks panel to make the bubble partially transparent with white border and have 10 stepped color to show the rank of trade surplus | ![](img/s29.png){width=100%}
+21 | Create a new sheet and drag *Date* to 'Columns', *Imports* and *Exports* to 'Rows' | ![](img/s30.png){width=100%}
+22 | Right click on the 'Exports' and select 'Dual Axis' | ![](img/s31.png){width=100%}
+23 | Edit color of two lines to correspond to the color map in the first chart | ![](img/s32.png){width=100%}
+24 | Edit x axis into 2 digit format and the  y axis  to cancel 'Include Zero' and title content.  | ![](img/s33.png){width=80%} ![](img/s34.png){width=80%}
+25 | Right click on the dual axis and select 'Synchronize Axis' and cancel 'Show Header' | ![](img/s35.png){width=70%}
+26 | Drag the chart border to make it small enough to put in the 'Tooltip' | ![](img/s36.png){width=60%}
+27 |  Go back to the first chart and drag *Date* into 'Tooltip' under Marks panel. Then edit it into 'AVG(YEAR(Date))'| ![](img/S37.png){width=100%}
+28 | Create a new calculated field to get the top net exporter and importer | ![](img/s37-1.png){width=100%} 
+29 | Double click 'Tooltip' and edit the content into concise sentence, make numbers' fonts bigger and insert the line graph | ![](img/s38.png){width=100%}
+30 | Edit the format of x and y axis to change number into custom format. Then change the x header color into blue and the y header color into red | ![](img/s39.png){width=100%} ![](img/s39-1.png){width=60%}
+31 | Drag *Top Net Trader*, *Market*, *Total Trade* into 'Label' and  | ![](s40){width=60%}
+32 | Right click 'Top Net Trade' label and edit 'Compute using' into 'Market'. Edit 'Total Trade' to change the format of numbers | ![](img/s37-3.png){width=80%} ![](img/s41.png){width=100%}
+33 | Click 'Label' under Marks panel and change its font to 'Match Mark Color'  | ![](img/s42.png){width=100%}
+34 | Edit the two axis to make the range into fixed value | ![](img/s35.png){width=70%}
+35 | Create a calculate field named 'Reference Line'. Drag it into 'Rows', click 'Dual Axis' and make the two axis synchronized and 'not show header' | ![](img/s46.png){width=70%} ![](img/s44.png){width=80%} ![](img/s45.png){width=60%}
+36 |  Change the reference line into 'Line' format and right click on the line to choose to show trend line | ![](img/s47.png){width=60%} ![](img/s48.png){width=100%}
+37 | Drag the chart into a new dashboard and edit the title, add a foot note to show notes and data source | ![](img/s49.png){width=70%} ![](img/s50.png){width=70%}
+
+
+# 5.0 Derived Insights
+
+1. **Top Trade Market**: China and Malaysia are the two top trading partners over past 10 years. 2013 was a turning point: Malaysia was the top trading partner for Singapore in 2013 and before, but after 2013, China took Malaysia's place to be the Singapore's top trading partner. On the other hand, merchandise trade between two countries and Singapore declined sharply in 2016 but turned growth in the following year.
+
+![](img/insight2-1.png){width=40%} 
+
+![](img/insight2-2.png){width=40%}
+
+
+![](img/insight2.png){width=40%}  
+
+
+2. **Hong Kong**: Hong Kong is a typical trade net exporter. Between 2011 and 2020, the trade export amount to Hong Kong are about SGD 6 billion and exports amount are under SGD 1 billion. Imports and exports amounts are very stable over last ten years.
+
+![](img/insight1.png){width=50%}  
+
+3. **TaiWan**: Over the past decade, both imports and exports have grown a lot overall. Same  with China and Malaysia, there was a decline in imports in 2016. But After 2016, imports and exports both grew steadily. And imports grew faster than exports. This led to a increasing amount of the trade surplus.
+
+![](img/insight3.png){width=50%}  
