@@ -1,16 +1,23 @@
 ---
-title: "dataviz-makeover-2"
+title: "DataViz Makeover 2"
 description: |
   In this post, we present a trade data use case using Tableau. We will critique the original visualisation from clarity and aesthetic and propose an alternative design.
 author:
   - name: LIU Yangguang
     url: https://www.linkedin.com/in/ygliu/
-date: 06-14-2021
+    affiliation: School of Computing and Information Systems, Singapore Management University
+    affiliation_url: https://scis.smu.edu.sg/master-it-business
+date: 06-20-2021
 output:
   distill::distill_article:
+    css: page_header.css
     self_contained: false
     toc: true
     toc_depth: 1
+categories:
+  - Tableau
+  - Makeover
+preview: final.png
 ---
 
 
@@ -136,6 +143,6 @@ The link to the interactive chart on Tableau Public Server can be found [here](h
 
 ![](img/insight1.png){width=50%}  
 
-3. **TaiWan**: Over the past decade, both imports and exports have grown a lot overall. Same  with China and Malaysia, there was a decline in imports in 2016. But After 2016, imports and exports both grew steadily. And imports grew faster than exports. This led to a increasing amount of the trade surplus.
+3. **Taiwan**: Over the past decade, both imports and exports have grown a lot overall. Same  with China and Malaysia, there was a decline in imports in 2016. But After 2016, imports and exports both grew steadily. And imports grew faster than exports. This led to a increasing amount of the trade surplus.
 
 ![](img/insight3.png){width=50%}  

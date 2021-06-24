@@ -1,12 +1,28 @@
 name: "Viz"
-title: "Visiualization"
+title: "Data Jounery"
+theme: white.css
 description: |
-  Visiualization
+  This is a blog built for my data journey
+base_url: https://ygliu.netlify.app/ # try to make preview image work
 output_dir: "_site"
 navbar:
+  logo:
+    image: media/move.gif
+    href:  https://ygliu.netlify.app/
   right:
-    - text: "Home"
+    - text: "Bio"
+      href: bio.html
+    - text: "Posts"
       href: index.html
     - text: "About"
       href: about.html
+    - icon: fab fa-github # fab fa-github , fab fa-github-alt fa-1x
+      href: https://github.com/CliveLiu/Viz
+favicon: media/favicon.png
+collections:  
+  posts:
+    # categories: false
+    authors_metadata: false # 'collections' disable to display authors
+    disqus: reproducible-finance-with-r # display comment disqus: reproducible-finance-with-r
+    citations: false # because base_url, the citation part will display by default
 output: distill::distill_article

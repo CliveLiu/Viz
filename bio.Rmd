@@ -1,0 +1,37 @@
+
+---
+title: "LIU Yangguang"
+image: "media/bio.jpg"
+links:
+  - label: LinkedIn
+    url: "https://www.linkedin.com/in/ygliu/"
+  - label: GitHub
+    url: "https://github.com/CliveLiu"
+  - label: Email
+    url: "mailto:ygliu.2020@mitb.smu.edu.sg"
+output:
+  postcards::trestles
+---
+ 
+## BIO
+
+Currently studying in SMU, I persuade a career towards data analytics.
+
+## EDUCATION
+
+###### Singapore Management University | Singapore, SG
+
+Master of IT in Business | January 2021 - (Expected) April 2022
+
+###### University of Electronic and Science Technology of China | Chengdu, CHINA
+
+B.S. in Finance and Computer Science | September 2016 - June 2020
+
+<!-- ## Experience -->
+
+<!-- **Google Brain** | Principal Investigator | January 2018 - Present -->
+
+
+<!-- Comment: Ctrl + Shift +C -->
+<!-- This BIO page is from: -->
+<!-- https://rstudio.github.io/distill/website.html?panelset1=screenshot&panelset2=screenshot2&panelset3=inspiration3&panelset=themed-site#postcards -->

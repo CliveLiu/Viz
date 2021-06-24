@@ -1,0 +1,14 @@
+
+d-title {
+padding-top: 12rem; /* Distance between nav bar and header */ 
+background: 
+    /* top, transparent red, faked with gradient */ 
+    linear-gradient(
+      rgba(255, 255, 255, 0.7),  /* filter color and gradient */ 
+      rgba(255, 255, 255, 0.999)
+    ),
+    /* bottom, image */
+    url(background.png) no-repeat center center fixed;
+background-size:cover !important;
+}
+
