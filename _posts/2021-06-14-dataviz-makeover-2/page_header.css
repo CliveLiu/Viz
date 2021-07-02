@@ -9,6 +9,6 @@ background:
     ),
     /* bottom, image */
     url(background.png) no-repeat center center fixed;
-background-size:cover !important;
+background-size:cover;
 }
 

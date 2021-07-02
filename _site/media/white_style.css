@@ -11,7 +11,7 @@
 /* Optional: embed custom fonts here with `@import`          */
 /* This must remain at the top of this file.                 */
 @import url('https://fonts.googleapis.com/css2?family=Cardo');
-@import url('https://fonts.googleapis.com/css2?family=Alata');
+@import url('https://fonts.googleapis.com/css2?family=Alata');  /* */
 
 
 html {
@@ -62,7 +62,7 @@ d-appendix {
 
 .distill-site-header {
   --title-size:       18px;
-  --text-color:       #000;                     /* edited */
+  --text-color:       #000;                     /* edited */ /* text on navbar */
   --text-size:        15px;
   --hover-color:      #ff00ff;                  /* edited */
   --bkgd-color:       #fff;                     /* edited */
