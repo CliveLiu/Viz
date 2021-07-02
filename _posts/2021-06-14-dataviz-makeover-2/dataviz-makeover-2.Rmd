@@ -1,7 +1,7 @@
 ---
 title: "DataViz Makeover 2"
 description: |
-  In this post, we present a trade data use case using Tableau. We will critique the original visualisation from clarity and aesthetic and propose an alternative design.
+  A makeover of the data visualisation on ten years merchandise trade amount with major partners
 author:
   - name: LIU Yangguang
     url: https://www.linkedin.com/in/ygliu/
@@ -24,6 +24,7 @@ preview: final.png
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
+
 # 1.0 Critique of Visualization
 
 The original visualization is shown as below.

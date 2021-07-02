@@ -12,6 +12,7 @@ output:
     self_contained: false
     toc: true
     toc_depth: 3
+    #number_sections: true
 categories:
   - Python
   - Machine Learning
