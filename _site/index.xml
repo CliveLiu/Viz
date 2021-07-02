@@ -12,18 +12,7 @@
       <link>https://ygliu.netlify.app/</link>
     </image>
     <generator>Distill</generator>
-    <lastBuildDate>Thu, 01 Jul 2021 00:00:00 +0000</lastBuildDate>
-    <item>
-      <title>What Factors Influence Taxi Tipping</title>
-      <dc:creator>LIU Yangguang</dc:creator>
-      <link>https://ygliu.netlify.app/posts/2021-07-02-nyc-taxi-tip-prediction</link>
-      <description>Perform exploratory data analysis and build ensemble learning models to predict taxi tip amount based on other trip information, geography location and timestamp data.</description>
-      <category>Python</category>
-      <category>Machine Learning</category>
-      <guid>https://ygliu.netlify.app/posts/2021-07-02-nyc-taxi-tip-prediction</guid>
-      <pubDate>Thu, 01 Jul 2021 00:00:00 +0000</pubDate>
-      <media:content url="https://ygliu.netlify.app/posts/2021-07-02-nyc-taxi-tip-prediction/bg.png" medium="image" type="image/png" width="2000" height="1585"/>
-    </item>
+    <lastBuildDate>Sun, 20 Jun 2021 00:00:00 +0000</lastBuildDate>
     <item>
       <title>DataViz Makeover 2</title>
       <dc:creator>LIU Yangguang</dc:creator>
