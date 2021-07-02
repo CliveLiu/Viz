@@ -19,6 +19,29 @@ preview: bg.png
 draft: true # not add in the list page
 ---
 
+<style> /* A floating TOC, but it's not suitable for long TOC*/
+html {
+  scroll-behavior: auto; /* change from smooth */
+}
+d-article {
+    contain: none;
+    overflow-x: hidden;
+  }
+#TOC {
+  position: fixed; /* float will make the toc fixed */
+  z-index: 50; /* priority when the elements overlap each other  */
+  background: white;     /* or#ebebeb; */
+  /* optional padding: 10px; border-radius: 5px; */
+  }
+
+/* Hide the ToC when resized to mobile or tablet:  480px, 768px, 900px */
+@media screen and (max-width: 900px) { /* change from 900 */
+#TOC {
+    position: relative;
+  }
+}
+</style>
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)

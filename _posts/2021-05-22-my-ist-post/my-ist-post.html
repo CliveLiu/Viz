@@ -115,7 +115,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--/radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-resource-manifest">
-  {"type":"character","attributes":{},"value":["img/2.png","img/image01.jpg","my-ist-post_files/anchor-4.2.2/anchor.min.js","my-ist-post_files/bowser-1.9.3/bowser.min.js","my-ist-post_files/distill-2.2.21/template.v2.js","my-ist-post_files/header-attrs-2.7/header-attrs.js","my-ist-post_files/jquery-1.11.3/jquery.min.js","my-ist-post_files/popper-2.6.0/popper.min.js","my-ist-post_files/tippy-6.2.7/tippy-bundle.umd.min.js","my-ist-post_files/tippy-6.2.7/tippy-light-border.css","my-ist-post_files/tippy-6.2.7/tippy.css","my-ist-post_files/tippy-6.2.7/tippy.umd.min.js","my-ist-post_files/webcomponents-2.0.0/webcomponents.js","nyc_taxi_tip_for distill.html"]}
+  {"type":"character","attributes":{},"value":["img/2.png","img/image01.jpg","my-ist-post_files/anchor-4.2.2/anchor.min.js","my-ist-post_files/bowser-1.9.3/bowser.min.js","my-ist-post_files/distill-2.2.21/template.v2.js","my-ist-post_files/header-attrs-2.7/header-attrs.js","my-ist-post_files/jquery-1.11.3/jquery.min.js","my-ist-post_files/popper-2.6.0/popper.min.js","my-ist-post_files/tippy-6.2.7/tippy-bundle.umd.min.js","my-ist-post_files/tippy-6.2.7/tippy-light-border.css","my-ist-post_files/tippy-6.2.7/tippy.css","my-ist-post_files/tippy-6.2.7/tippy.umd.min.js","my-ist-post_files/webcomponents-2.0.0/webcomponents.js"]}
   </script>
   <!--radix_placeholder_navigation_in_header-->
   <!--/radix_placeholder_navigation_in_header-->
@@ -1489,6 +1489,28 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </ul>
 </nav>
 </div>
+<style> /* A floating TOC, but it's not suitable for long TOC*/
+html {
+  scroll-behavior: auto; /* change from smooth */
+}
+d-article {
+    contain: none;
+    overflow-x: hidden;
+  }
+#TOC {
+  position: fixed; /* float will make the toc fixed */
+  z-index: 50; /* priority when the elements overlap each other  */
+  background: white;     /* or#ebebeb; */
+  /* optional padding: 10px; border-radius: 5px; */
+  }
+
+/* Hide the ToC when resized to mobile or tablet:  480px, 768px, 900px */
+@media screen and (max-width: 900px) { /* change from 900 */
+#TOC {
+    position: relative;
+  }
+}
+</style>
 <p><img src="img/2.png" style="width:20.0%" /></p>
 <h1 id="overview">1.0 Overview</h1>
 <p>In this article, we will show you how to plot a figure with multiple histograms by using <a href="https://ggplot2.tidyverse.org/"><strong>ggplot2</strong></a> and <a href="nyc_taxi_tip_for%20distill.html"><strong>ggpubr</strong></a> packages.</p>

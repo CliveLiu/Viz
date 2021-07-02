@@ -1,7 +1,7 @@
 ---
-title: "What Factors Influence Taxi Tipping"
+title: "What Factors Will Influence Taxi Tipping"
 description: |
-  Perform exploratory data analysis and build ensemble learning models to predict taxi tip amount based on other trip information, geography location and timestamp data.
+  Perform exploratory data analysis and build ensemble learning models to predict taxi tip amount based on other trip information, geography location and datetime data.
 author:
   - name: LIU Yangguang
     url: https://www.linkedin.com/in/ygliu/
@@ -20,25 +20,26 @@ preview: bg.png
 
 <style> /* A floating TOC, but it's not suitable for long TOC*/
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto; /* smooth, auto */
 }
 d-article {
     contain: none;
     overflow-x: hidden;
   }
 #TOC {
-  position: fixed; /* float will make the toc fixed */
+  position: relative; /* float will make the toc fixed; 'fixed' can make toc float */
   z-index: 50; /* priority when the elements overlap each other  */
   background: white;     /* or#ebebeb; */
   /* optional padding: 10px; border-radius: 5px; */
   }
 
 /* Hide the ToC when resized to mobile or tablet:  480px, 768px, 900px */
-@media screen and (max-width: 900px) { /* change from 900 */
+@media screen and (min-height: 55em) and (min-width: 65em) { /* change from 900 , min-width: 80em, min-width: 1000px*/
 #TOC {
-    position: relative;
+    position: fixed;
   }
 }
+
 </style>
 
 
@@ -54,7 +55,7 @@ The taxi fare amount is decided by trip distance, pickup time and so on. It has 
 
 The objective of this study is to build predictive models to predict what factors will influence the taxi tip amount. It would help taxi drivers and online ride-hailing platforms to figure out the important factors and add the revenue.
 
-The python code was written in the jupyter notebook and can be found [here](nyc_taxi_tip_code.html)
+The study is done using python and jupyter notebook. The code notebook can be found [here](nyc_taxi_tip_code.html).
 
 ## Data Exploration
 
@@ -66,7 +67,6 @@ First, import the data and take a quick peek at how the data looks like.
 
 ```{python}
 import pandas as pd
-import numpy as np
 raw = pd.read_csv('taxi_5_row.csv')
 ```
 
@@ -181,7 +181,6 @@ Besides, we don't plot the two datetime features here because they are the combi
 ```{python, eval=FALSE, echo=TRUE}
 numerical_fea = ['pickup_longitude', 'pickup_latitude', 'dropoff_longitude', 'dropoff_latitude', 
                   'passenger_count', 'trip_distance', 'fare_amount', 'tip_amount']
-
 f = pd.melt(raw, value_vars=numerical_fea) # melt the col
 g = sns.FacetGrid(f, col="variable",  col_wrap=4, sharex=False, sharey=False)
 g = g.map(sns.histplot, "value")
@@ -225,9 +224,9 @@ report = pandas_profiling.ProfileReport(df_null)
 report.to_widgets()
 ```
 
-The result can be found [here](row_with_missing.html). But  there is nothing special about the feature distribution in these rows. Thus, we would not process from rows.
+The result can be found [here](row_with_missing.html). But there is no significant findings about the feature distribution of these rows with missing value. 
 
-We can only replace the missing value from its distribution. Because one value take the majority, we will group the missing value and other values into one group.
+Thus, we can only replace the missing value from its onwn distribution. And because one value take the majority, we will group the missing value and other values into one group.
 
 ```{python, echo=TRUE, eval=FALSE}
 raw['rate_code_group'] = raw['rate_code'].apply(lambda x:'1' if x == 1.0 else 'Others')
@@ -257,9 +256,9 @@ raw_clean = raw.loc[idx]
 
 ![](img/boxplot.png)
 
-We excluded 83 extreme outlier samples out of the 1 million raw data. It will help improve the model performance as well as robustness. 
+In total, We excluded 83 extreme outlier samples out of the 1 million raw data. It will help improve the model performance as well as the robustness. 
 
-#### Datetime
+#### Datetime Features
 
 The datetime features are transformed from string to datetime and switch to the local timezone in the New York. Thus we can get the real datetime data. We can find that the date cover from 2009 to 2015.
 
