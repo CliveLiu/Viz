@@ -1,6 +1,6 @@
 name: "Viz"
 title: "Data Jounery"
-theme: white.css
+theme: media/white_theme.css
 description: |
   This is a blog built for my data journey
 base_url: https://ygliu.netlify.app/ # try to make preview image work

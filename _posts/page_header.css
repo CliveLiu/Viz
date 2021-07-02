@@ -1,0 +1,21 @@
+d-title {
+padding-top: 6rem; /* Distance between nav bar and header */ 
+background: 
+    /* top, transparent red, faked with gradient */ 
+    linear-gradient(
+      rgba(255, 255, 255, 0.3),  /* filter color and gradient */ 
+      rgba(255, 255, 255, 0.999)
+    ),
+    /* bottom, image */
+    url(bg.png);
+background-position: center; /*  */
+
+/* different browser */
+-webkit-background-size: cover; 
+-moz-background-size: cover;
+-o-background-size: cover;
+background-size: cover; /* enlarge the pic to make the pic width fit the browser width */
+/* for pic I want to display the whole, 
+use contain for 'background-size' and top for 'background-position' 
+background-repeat: no-repeat;*/
+}
