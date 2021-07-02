@@ -15,7 +15,7 @@ output:
  
 ## BIO
 
-Currently studying in SMU, I persuade a career towards data analytics.
+Currently studying in SMU, I persuade a career towards data analytics. The fortune of data keeps increasing and I'll keep learning to go further in the data journey.
 
 ## EDUCATION
 
