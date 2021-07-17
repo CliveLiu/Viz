@@ -2215,8 +2215,22 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   }
 
   /* CHANGE CODE CHUNK COLORS */
-  d-code {
-    background: red;
+  d-article div.sourceCode pre {
+  	padding: .5em;
+  	background: #f5f5f5; /* color of source code chunks */
+  	border-radius: 0;
+  	border-style: none none none groove; /* only left border of chunks shows*/
+  	padding: .5em;
+  	overflow-x: auto;
+  }
+  /* CHANGE output chunks COLORS */
+  /* it should change all chunks, but the source code chunks are defined above seperately */
+  d-article pre {
+    background-color: #ffffff; 
+    border: 1.5px dotted #b8b8b8; /* border-style */
+    border-radius: 2px;
+    padding: .5em; /* border */
+    overflow-x: scroll;
   }</style>
   <style type="text/css">
   /* base style */

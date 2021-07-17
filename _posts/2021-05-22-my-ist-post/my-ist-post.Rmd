@@ -5,13 +5,14 @@ description: |
 author:
   - name: LIU Yangguang
     url: https://www.linkedin.com/in/ygliu/
-    affiliation: School of Computing and Information Systems, Singapore Management University
+    
 date: 06-29-2021
 output:
   distill::distill_article:
     self_contained: false
     toc: true
     toc_depth: 3
+    css: page_header.css
 categories:
   - Python
   - Machine Learning
@@ -50,6 +51,24 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ![](img/2.png){width=20%}
 
+word testword testword testword testword testword testword testword testword testword test
+
+
+```{r, echo = TRUE, eval=FALSE}
+1+2
+x <- "test 2"
+```
+
+word testword testword testword testword testword testword testword testword testword test
+
+
+```{r, layout='l-body-outset', echo = TRUE}
+#library(rmarkdown)
+#paged_table(py$raw, options = list(rows.print = 5))
+print('xxxx')
+```
+
+word testword testword testword testword testword testword testword testword testword test
 
 # 1.0 Overview
 
@@ -82,8 +101,4 @@ Next, you will use the code chunk below to install and launch ggpubr and tidyver
 3 | Select all the date variables, right click and choose the pivot to make date variables into one | ![](img/s3.png){width=100%}
 
 
-```{r, layout='l-body-outset'}
-#library(rmarkdown)
-#paged_table(py$raw, options = list(rows.print = 5))
-print('xxxx')
-```
+

@@ -2216,8 +2216,22 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   }
 
   /* CHANGE CODE CHUNK COLORS */
-  d-code {
-    background: red;
+  d-article div.sourceCode pre {
+  	padding: .5em;
+  	background: #f5f5f5; /* color of source code chunks */
+  	border-radius: 0;
+  	border-style: none none none groove; /* only left border of chunks shows*/
+  	padding: .5em;
+  	overflow-x: auto;
+  }
+  /* CHANGE output chunks COLORS */
+  /* it should change all chunks, but the source code chunks are defined above seperately */
+  d-article pre {
+    background-color: #ffffff; 
+    border: 1.5px dotted #b8b8b8; /* border-style */
+    border-radius: 2px;
+    padding: .5em; /* border */
+    overflow-x: scroll;
   }</style>
   <style type="text/css">
   /* base style */
@@ -2560,7 +2574,7 @@ function init_posts_list() {
 <a href="posts/2021-07-02-nyc-taxi-tip-prediction/" class="post-preview">
 <script class="post-metadata" type="text/json">{"categories":["Python","Machine Learning"]}</script>
 <div class="metadata">
-<div class="publishedDate">June 30, 2021</div>
+<div class="publishedDate">July 1, 2021</div>
 </div>
 <div class="thumbnail">
 <img src="posts/2021-07-02-nyc-taxi-tip-prediction/bg.png"/>
@@ -2640,7 +2654,7 @@ function init_posts_list() {
 <a href="#">More articles &raquo;</a>
 </div>
 </div>
-<!--/radix_placeholder_article_listing-->
+<!--/radix_placeholder_article_listing-->
 
 <div class="d-title">
 <h1>Posts</h1>
