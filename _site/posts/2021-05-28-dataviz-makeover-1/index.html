@@ -2251,7 +2251,32 @@ d-article pre {
   border-radius: 2px;
   padding: .5em; /* border */
   overflow-x: scroll;
-}</style>
+}
+
+
+d-byline {
+  margin-block-start: unset; /* distance between intro and article metadata*/
+  display: ; /* none: hide the article metadata*/
+}
+
+d-byline .byline {
+  grid-template-columns: 2fr;
+}
+
+d-byline .byline h3{
+  margin-block-start: 0.5em; /* distance between text in  article metadata*/
+}
+
+d-byline .byline .authors-affiliations h3 {
+  margin-block-start: 0em; /* distance between 'author' and the cut line*/
+}
+
+/*  make the four elements into one line */
+/* 1fr or auto */
+d-byline .byline {
+  grid-template-columns: auto auto auto auto; 
+}
+</style>
 <style type="text/css">
 /* base style */
 
@@ -2653,6 +2678,15 @@ d-appendix d-footnote-list a.footnote-backlink {
       <i class="fas fa-comments"></i>
       &nbsp;
       <span class="disqus-comment-count" data-disqus-identifier="posts/2021-05-28-dataviz-makeover-1/">Comment on this article</span>
+    </span>
+    <span class="article-sharing">
+      Share: &nbsp;
+      <a href="https://twitter.com/share?text=DataViz%20Makeover%201&amp;url=https%3A%2F%2Fygliu.netlify.app%2Fposts%2F2021-05-28-dataviz-makeover-1%2F">
+        <i class="fab fa-twitter"></i>
+      </a>
+      <a href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3A%2F%2Fygliu.netlify.app%2Fposts%2F2021-05-28-dataviz-makeover-1%2F&amp;title=DataViz%20Makeover%201">
+        <i class="fab fa-linkedin"></i>
+      </a>
     </span>
   </p>
   <script id="dsq-count-scr" src="https://reproducible-finance-with-r.disqus.com/count.js" async></script>

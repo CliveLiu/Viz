@@ -2232,7 +2232,32 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     border-radius: 2px;
     padding: .5em; /* border */
     overflow-x: scroll;
-  }</style>
+  }
+
+
+  d-byline {
+    margin-block-start: unset; /* distance between intro and article metadata*/
+    display: ; /* none: hide the article metadata*/
+  }
+
+  d-byline .byline {
+    grid-template-columns: 2fr;
+  }
+
+  d-byline .byline h3{
+    margin-block-start: 0.5em; /* distance between text in  article metadata*/
+  }
+
+  d-byline .byline .authors-affiliations h3 {
+    margin-block-start: 0em; /* distance between 'author' and the cut line*/
+  }
+
+  /*  make the four elements into one line */
+  /* 1fr or auto */
+  d-byline .byline {
+    grid-template-columns: auto auto auto auto; 
+  }
+  </style>
   <style type="text/css">
   /* base style */
 

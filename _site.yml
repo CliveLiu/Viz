@@ -24,5 +24,6 @@ collections:
     # categories: false
     authors_metadata: false # 'collections' disable to display authors
     disqus: reproducible-finance-with-r # display comment disqus: reproducible-finance-with-r
-    citations: false # because base_url, the citation part will display by default
+    citations: false # because base_url, the citation part in the article metadata will display by default
+    share: [twitter, linkedin]
 output: distill::distill_article
