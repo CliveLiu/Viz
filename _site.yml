@@ -16,9 +16,9 @@ navbar:
       href: index.html
     - text: "About"
       href: about.html
-    - icon: fab fa-github # fab fa-github , fab fa-github-alt fa-1x
+    - icon: fa fa-github # fab fa-github , fab fa-github-alt fa-1x, fab or fa
       href: https://github.com/CliveLiu/Viz
-    - icom: fab fa-linkedin
+    - icon: fa fa-linkedin-square # fab fa-linkedin, fa fa-linkedin
       href: https://www.linkedin.com/in/ygliu/
 favicon: media/favicon.png
 collections:  
