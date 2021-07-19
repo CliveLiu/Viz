@@ -21,9 +21,9 @@ navbar:
 favicon: media/favicon.png
 collections:  
   posts:
-    # categories: false
+    # categories: false # display category labels on post listing page
     authors_metadata: false # 'collections' disable to display authors
     disqus: reproducible-finance-with-r # display comment disqus: reproducible-finance-with-r
     citations: false # because base_url, the citation part in the article metadata will display by default
-    share: [twitter, linkedin]
+    share: [twitter, linkedin, facebook]
 output: distill::distill_article

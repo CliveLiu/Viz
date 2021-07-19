@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 This personal blog is updated with the coursework of Visual Analytics and Applications, taught by Professor [Kam Tin Seong](https://faculty.smu.edu.sg/profile/kam-tin-seong-486) at Singapore Management University. And in the future, it might also be updated with my other coursework and projects.
 
-The blog was built using [distill](https://rstudio.github.io/distill/) and posts were written by [rmarkdown](https://rmarkdown.rstudio.com/). A handy guide for creating a website can be found [here](https://www.andreashandel.com/post/distill-github-website/).
+The blog was built using [distill](https://rstudio.github.io/distill/) and [rmarkdown](https://rmarkdown.rstudio.com/), hosted on [netify](https://www.netlify.com/). A handy guide for creating a website can be found [here](https://lisalendway.netlify.app/posts/2020-12-09-buildingdistill/#customize-the-home-page).
 
 The design of the blog was created with some graphics and CSS:
 
