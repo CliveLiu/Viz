@@ -18,6 +18,8 @@ navbar:
       href: about.html
     - icon: fab fa-github # fab fa-github , fab fa-github-alt fa-1x
       href: https://github.com/CliveLiu/Viz
+    - icom: fab fa-linkedin
+      href: https://www.linkedin.com/in/ygliu/
 favicon: media/favicon.png
 collections:  
   posts:
