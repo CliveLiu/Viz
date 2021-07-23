@@ -1,7 +1,7 @@
 ---
 title: "VAST Challenge 2021 MC2"
 description: |
-  To visualize and analyze movement and tracking data
+  To visualize & analyze card usage and car movement data with the employee disappearance incident
 author:
   - name: LIU Yangguang
     url: https://www.linkedin.com/in/ygliu/
@@ -11,7 +11,9 @@ output:
   distill::distill_article:
     self_contained: false
     toc: true
-    toc_depth: 2
+    toc_depth: 3
+    toc_float: true
+    #code_folding: true
 categories:
   - R
   - Visualization
@@ -19,7 +21,7 @@ preview: data/MC2-tourist.jpg
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE,
+knitr::opts_chunk$set(echo = TRUE,
                       message = FALSE,
                       warning = FALSE)
 ```
@@ -104,13 +106,14 @@ cc$hour <- hour(cc$datetime)
 
 
 
-```{r}
+```{r, layout="l-body-outset"}
 cc_freq_day <- as.data.frame(xtabs(~location+day, data = cc)) # 二维列联表
 loyalty_freq_day <- as.data.frame(xtabs(~location+day, data = loyalty)) # 二维列联表
 
 freq_day_join <- full_join(cc_freq_day,loyalty_freq_day,by= c("location","day"))
 names(freq_day_join) <- c("location","day","CC_Freq","Loyalty_Freq")
-freq_day_join$day <- as.integer(freq_day_join$day)
+# transfer from factors to numeric with original values
+freq_day_join$day <- as.numeric(levels(freq_day_join$day))[freq_day_join$day]
 dt_freq_day <- highlight(freq_day_join)
 p1 <- ggplot(dt_freq_day,aes(x=day,y=location))+
   geom_tile(aes(fill=CC_Freq))+
@@ -134,7 +137,7 @@ plotly::subplot(ggplotly(p1),
   layout(annotations = list(x = 0.02 , y = 1.06, text = "Usage Frequency of Credit (left) and Loyalty (right) Card", showarrow = F, xref='paper', yref='paper'))
 ```
 
-```{r}
+```{r, layout="l-body-outset"}
 cc_price_matrix <- tapply(cc$price,cc[,c("location","day")],sum)
 cc_price <- reshape2::melt(cc_price_matrix)
 
@@ -172,7 +175,7 @@ Now, let's divide the units from days into hours:
 
 ```{r, layout="l-screen", fig.height=10}
 cc_freq_day_hour <- as.data.frame(xtabs(~location++day+hour, data = cc))
-cc_freq_day_hour$hour <- as.integer(cc_freq_day_hour$hour)
+cc_freq_day_hour$hour <- as.numeric(levels(cc_freq_day_hour$hour))[cc_freq_day_hour$hour]
 p3 <- ggplot(cc_freq_day_hour,aes(x=hour,y=location))+
   geom_tile(aes(fill=Freq),color="white")+
   scale_fill_gradient(low = "#EFF7FB", high = "#0D2330")+
