@@ -1,5 +1,25 @@
 [
   {
+    "path": "posts/2021-07-23-vast-challenge-2021-mc2/",
+    "title": "VAST Challenge 2021 MC2",
+    "description": "A short description of the post.",
+    "author": [
+      {
+        "name": "LIU Yangguang",
+        "url": "https://www.linkedin.com/in/ygliu/"
+      }
+    ],
+    "date": "2021-07-23",
+    "categories": [
+      "R",
+      "Visualization"
+    ],
+    "contents": "\r\nDistill is a publication format for scientific and technical writing, native to the web.\r\nLearn more about using Distill at https://rstudio.github.io/distill.\r\n\r\n\r\n\r\n",
+    "preview": {},
+    "last_modified": "2021-07-23T23:00:09+08:00",
+    "input_file": {}
+  },
+  {
     "path": "posts/2021-07-02-nyc-taxi-tip-prediction/",
     "title": "What Factors Will Influence Taxi Tipping",
     "description": "Perform exploratory data analysis and build ensemble learning models to predict taxi tip amount based on other trip information, geography location and datetime data.",

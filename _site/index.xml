@@ -12,7 +12,17 @@
       <link>https://ygliu.netlify.app/</link>
     </image>
     <generator>Distill</generator>
-    <lastBuildDate>Thu, 01 Jul 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 23 Jul 2021 00:00:00 +0000</lastBuildDate>
+    <item>
+      <title>VAST Challenge 2021 MC2</title>
+      <dc:creator>LIU Yangguang</dc:creator>
+      <link>https://ygliu.netlify.app/posts/2021-07-23-vast-challenge-2021-mc2</link>
+      <description>A short description of the post.</description>
+      <category>R</category>
+      <category>Visualization</category>
+      <guid>https://ygliu.netlify.app/posts/2021-07-23-vast-challenge-2021-mc2</guid>
+      <pubDate>Fri, 23 Jul 2021 00:00:00 +0000</pubDate>
+    </item>
     <item>
       <title>What Factors Will Influence Taxi Tipping</title>
       <dc:creator>LIU Yangguang</dc:creator>

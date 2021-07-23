@@ -5,10 +5,16 @@ description: |
 author:
   - name: LIU Yangguang
     url: https://www.linkedin.com/in/ygliu/
+    affiliation: School of Computing and Information Systems, Singapore Management
 date: 07-23-2021
 output:
   distill::distill_article:
     self_contained: false
+    toc: true
+    toc_depth: 3
+categories:
+  - R
+  - Visualization
 ---
 
 
