@@ -11,14 +11,12 @@ output:
   distill::distill_article:
     self_contained: false
     toc: true
-    toc_depth: 3
+    toc_depth: 2
 categories:
   - R
   - Visualization
 preview: data/MC2-tourist.jpg
 ---
-
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE,
@@ -51,7 +49,18 @@ Use visual analytics to identify which GASTech employees made which purchases an
 
 5. Do you see evidence of suspicious activity? Identify 1- 10 locations where you believe the suspicious activity is occurring, and why Please limit your response to 10 images and 500 words.
 
-## Q1:
+### Literature review
+
+how the analysis were performed before
+identify gaps whereby interactive visual analytics approach can be used to enhance user experience
+
+## Data Preparation
+
+Extracting, wrangling and preparing the input data required to perform the analysis. The focus should be on exploring appropriate **tidyverse** methods
+
+## Visualization and Insights
+
+### Q1:
 以地点为单位
 按照day的freq和price的热力图，分别看两个数据产生的热力图是否有不一致+两幅图联动选择；
 按照24小时的热力图，单幅
@@ -148,7 +157,7 @@ plotly::subplot(ggplotly(p1_price),
 
 ```
 
-### most popular locations:...
+#### most popular locations:...
 
 Now, let's divide the units from days into hours:
 
@@ -170,25 +179,26 @@ ggplotly(p3)
 
 
 
-### Anomalies:
+#### Anomalies:
 
 
-## Q2：
+### Q2：
 画地图时，参考清华的Q3的流程
 需要考虑的包，包括mapview，S8有写
 
 
-## Q3:
+### Q3:
 S9里的Bipartite：匹配信用卡和会员数据？
 美化可以参考-Parallel Sets of https://cheriewpq.shinyapps.io/isss608_group02/
 
-## Q4:
+### Q4:
 鉴别potential informal or unofficial relationships among GASTech personnel.
 
-## Q5:
+### Q5:
 suspicious activity: Identify 1- 10 locations where you believe the suspicious activity is occurring, and why Please limit your response to 10 images and 500 words.
 
 卡车，用于非商业活动的也算可疑活动
 
+## Conclusion
 
 
