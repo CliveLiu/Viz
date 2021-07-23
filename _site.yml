@@ -20,7 +20,7 @@ navbar:
       href: https://github.com/CliveLiu/Viz
     - icon: fa fa-linkedin-square # fab fa-linkedin, fa fa-linkedin
       href: https://www.linkedin.com/in/ygliu/
-favicon: media/favicon.png
+favicon: media/favicon4.png
 collections:  
   posts:
     # categories: false # display category labels on post listing page
