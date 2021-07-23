@@ -51,12 +51,21 @@ Use visual analytics to identify which GASTech employees made which purchases an
 
 ### Literature review
 
-how the analysis were performed before
-identify gaps whereby interactive visual analytics approach can be used to enhance user experience
+The VAST Challenge 2014 has the same scenario with slightly different dataset and questions. The submission repository can be found [here](http://visualdata.wustl.edu/varepository/VAST%20Challenge%202014/challenges/MC2%20-%20Patterns%20of%20Life%20Analysis/).
+
+Various analytic tools were used among the submissions, like JMP, D3 and custom tools. The heatmap and time histograms were useful to represent the numerical value under the combination of one  categorical variable and one discrete/categorical variable, such as the usage frequency under different locations and days. Besides, movement line graph with the map background  can help to identify and check suspicious activities.
+
+However, almost all graphs were static and readers would find it difficult to explore other parts in graphs which were not specially mentioned by authors. Since the study is displayed on html page, the interactive graphs will be possible. For example, the tooltip function can make every data point to have detailed information without checking the axis or drawing additional graphs. The zoom-in and onclick functions allow readers to check the whole complex graph with too many lines/objects and focus on one part only.  
+
+
 
 ## Data Preparation
 
 Extracting, wrangling and preparing the input data required to perform the analysis. The focus should be on exploring appropriate **tidyverse** methods
+
+### QGIS
+
+
 
 ## Visualization and Insights
 
@@ -163,6 +172,7 @@ Now, let's divide the units from days into hours:
 
 ```{r, layout="l-screen", fig.height=10}
 cc_freq_day_hour <- as.data.frame(xtabs(~location++day+hour, data = cc))
+cc_freq_day_hour$hour <- as.integer(cc_freq_day_hour$hour)
 p3 <- ggplot(cc_freq_day_hour,aes(x=hour,y=location))+
   geom_tile(aes(fill=Freq),color="white")+
   scale_fill_gradient(low = "#EFF7FB", high = "#0D2330")+
@@ -171,7 +181,6 @@ p3 <- ggplot(cc_freq_day_hour,aes(x=hour,y=location))+
         axis.title = element_blank(),
         legend.title=element_blank(),
         plot.title = element_text(hjust=0.5))+
-  scale_x_discrete(position = "top")+
   facet_wrap(~ day, ncol = 7)+
   labs(title = "CC Frequency by hour of the day") 
 ggplotly(p3)
@@ -190,6 +199,8 @@ ggplotly(p3)
 ### Q3:
 S9里的Bipartite：匹配信用卡和会员数据？
 美化可以参考-Parallel Sets of https://cheriewpq.shinyapps.io/isss608_group02/
+定义所有car stop大于1分钟的作为一次stop，找出所有stop的gps定位。得到停车的开始结束时间+stop的定位
+和cc的数据全连接，然后统计匹配航叔的频次？画出Bipartite？
 
 ### Q4:
 鉴别potential informal or unofficial relationships among GASTech personnel.
@@ -198,6 +209,8 @@ S9里的Bipartite：匹配信用卡和会员数据？
 suspicious activity: Identify 1- 10 locations where you believe the suspicious activity is occurring, and why Please limit your response to 10 images and 500 words.
 
 卡车，用于非商业活动的也算可疑活动
+
+day*hour的图片
 
 ## Conclusion
 
