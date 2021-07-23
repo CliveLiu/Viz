@@ -1,7 +1,7 @@
 ---
 title: "VAST Challenge 2021 MC2"
 description: |
-  A short description of the post.
+  To visualize and analyze movement and tracking data
 author:
   - name: LIU Yangguang
     url: https://www.linkedin.com/in/ygliu/
@@ -22,11 +22,34 @@ preview: data/MC2-tourist.jpg
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE,
-                      eval = FALSE,
                       message = FALSE,
                       warning = FALSE)
 ```
 
+
+## Background
+
+This study is based on the [Mini-Challenge 2](https://vast-challenge.github.io/2021/MC2.html) of the [VAST Challenge 2021](https://vast-challenge.github.io/2021/). In a fiction scenario, there is a natural gas company named "GASTech" operating in the island country if Kronos. The GASTech didn't do well in environment stewardship. And after an company IPO celebration in January 2014, several employees of GASTech went missing. An environment organization is suspected in the disappearance.
+
+Many of the Abila, Kronos-based employees of GAStech have company cars which are approved for both personal and business use. And the others who don't have company cars can check and use company trucks for business use. The GPS tracking data of these company vehicles is available for the two weeks prior the disappearance.
+
+And the company also provides a loyalty card to employees to give them discounts in the local businesses. And their credit card purchases and loyalty cards usage data are provided. But these data does not have persona information beyond purchases.
+
+### Requirement
+
+Use visual analytics to identify which GASTech employees made which purchases and identify suspicious patterns of behavior. Besides, the study must cope with uncertainties that result from missing, conflicting, and imperfect data to make recommendations for further investigation.
+
+### Questions
+
+1. Using just the credit and loyalty card data, identify the most popular locations, and when they are popular. What anomalies do you see? What corrections would you recommend to correct these anomalies? Please limit your answer to 8 images and 300 words.
+
+2. Add the vehicle data to your analysis of the credit and loyalty card data. How does your assessment of the anomalies in question 1 change based on this new data? What discrepancies between vehicle, credit, and loyalty card data do you find? Please limit your answer to 8 images and 500 words.
+
+3. Can you infer the owners of each credit card and loyalty card? What is your evidence? Where are there uncertainties in your method? Where are there uncertainties in the data? Please limit your answer to 8 images and 500 words.
+
+4. Given the data sources provided, identify potential informal or unofficial relationships among GASTech personnel. Provide evidence for these relationships. Please limit your response to 8 images and 500 words.
+
+5. Do you see evidence of suspicious activity? Identify 1- 10 locations where you believe the suspicious activity is occurring, and why Please limit your response to 10 images and 500 words.
 
 ## Q1:
 以地点为单位
@@ -165,7 +188,7 @@ S9里的Bipartite：匹配信用卡和会员数据？
 ## Q5:
 suspicious activity: Identify 1- 10 locations where you believe the suspicious activity is occurring, and why Please limit your response to 10 images and 500 words.
 
-
+卡车，用于非商业活动的也算可疑活动
 
 
 
