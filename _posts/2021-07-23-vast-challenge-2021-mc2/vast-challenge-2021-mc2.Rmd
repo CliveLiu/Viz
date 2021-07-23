@@ -15,15 +15,157 @@ output:
 categories:
   - R
   - Visualization
+preview: data/MC2-tourist.jpg
 ---
 
 
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE,
+                      eval = FALSE,
+                      message = FALSE,
+                      warning = FALSE)
 ```
 
-Distill is a publication format for scientific and technical writing, native to the web.
 
-Learn more about using Distill at <https://rstudio.github.io/distill>.
+## Q1:
+以地点为单位
+按照day的freq和price的热力图，分别看两个数据产生的热力图是否有不一致+两幅图联动选择；
+按照24小时的热力图，单幅
+hour*day的freq + 加上它是星期几的tooltip？
+交互的可以选择人和day的24小时的热力图？
+多个波动的折线图上下重叠？
+异常指数据异常，而不是可疑活动
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(lubridate)
+library(dplyr)
+library(plotly)
+```
+
+
+```{r}
+loyalty <- read_csv("data/loyalty_data.csv", locale=locale(encoding ="windows-1252"))
+cc <- read_csv("data/cc_data.csv", locale=locale(encoding ="windows-1252"))
+```
+
+```{r}
+# convert str into date/time
+loyalty$timestamp <- as.Date(loyalty$timestamp, "%m/%d/%Y")
+loyalty$day <- mday(loyalty$timestamp)
+cc$datetime <- strptime(cc$timestamp, "%m/%d/%Y %H:%M")
+cc$date <- as.Date(cc$timestamp, "%m/%d/%Y %H:%M")
+cc$day <- mday(cc$date)
+cc$hour <- hour(cc$datetime)
+```
+
+
+
+```{r}
+cc_freq_day <- as.data.frame(xtabs(~location+day, data = cc)) # 二维列联表
+loyalty_freq_day <- as.data.frame(xtabs(~location+day, data = loyalty)) # 二维列联表
+
+freq_day_join <- full_join(cc_freq_day,loyalty_freq_day,by= c("location","day"))
+names(freq_day_join) <- c("location","day","CC_Freq","Loyalty_Freq")
+freq_day_join$day <- as.integer(freq_day_join$day)
+dt_freq_day <- highlight(freq_day_join)
+p1 <- ggplot(dt_freq_day,aes(x=day,y=location))+
+  geom_tile(aes(fill=CC_Freq))+
+  scale_fill_gradient(low = "#deeff7", high = "#0D2330")+
+  theme(panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        legend.title=element_blank())
+
+p2 <- ggplot(dt_freq_day,aes(x=day,y=location))+
+  geom_tile(aes(fill=Loyalty_Freq))+
+  scale_fill_gradient(low = "#deeff7", high = "#0D2330")+
+  theme(panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        legend.title=element_blank())
+
+plotly::subplot(ggplotly(p1),
+                ggplotly(p2),
+                shareY = TRUE) %>% 
+  layout(annotations = list(x = 0.02 , y = 1.06, text = "Usage Frequency of Credit (left) and Loyalty (right) Card", showarrow = F, xref='paper', yref='paper'))
+```
+
+```{r}
+cc_price_matrix <- tapply(cc$price,cc[,c("location","day")],sum)
+cc_price <- reshape2::melt(cc_price_matrix)
+
+loyalty_price_matrix <- tapply(loyalty$price,loyalty[,c("location","day")],sum)
+loyalty_price <- reshape2::melt(loyalty_price_matrix)
+
+price_day_join <- full_join(cc_price,loyalty_price,by= c("location","day"))
+names(price_day_join) <- c("location","day","Price.","Price")
+# price_day_join$Price.[is.na(price_day_join$Price.)] <- 0
+# price_day_join$Price[is.na(price_day_join$Price)] <- 0
+p1_price <- ggplot(price_day_join,aes(x=day,y=location))+
+  geom_tile(aes(fill=Price.))+
+  scale_fill_gradient(low = "#deeff7", high = "#0D2330")+
+  theme(panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        legend.title=element_blank())
+p2_price <- ggplot(price_day_join,aes(x=day,y=location))+
+  geom_tile(aes(fill=Price))+
+  scale_fill_gradient(low = "#deeff7", high = "#0D2330")+
+  theme(panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        legend.title=element_blank())
+
+plotly::subplot(ggplotly(p1_price),
+        ggplotly(p2_price),
+        shareY = TRUE)
+
+```
+
+### most popular locations:...
+
+Now, let's divide the units from days into hours:
+
+```{r, layout="l-screen", fig.height=10}
+cc_freq_day_hour <- as.data.frame(xtabs(~location++day+hour, data = cc))
+p3 <- ggplot(cc_freq_day_hour,aes(x=hour,y=location))+
+  geom_tile(aes(fill=Freq),color="white")+
+  scale_fill_gradient(low = "#EFF7FB", high = "#0D2330")+
+  theme(panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        legend.title=element_blank(),
+        plot.title = element_text(hjust=0.5))+
+  scale_x_discrete(position = "top")+
+  facet_wrap(~ day, ncol = 7)+
+  labs(title = "CC Frequency by hour of the day") 
+ggplotly(p3)
+```
+
+
+
+### Anomalies:
+
+
+## Q2：
+画地图时，参考清华的Q3的流程
+需要考虑的包，包括mapview，S8有写
+
+
+## Q3:
+S9里的Bipartite：匹配信用卡和会员数据？
+美化可以参考-Parallel Sets of https://cheriewpq.shinyapps.io/isss608_group02/
+
+## Q4:
+鉴别potential informal or unofficial relationships among GASTech personnel.
+
+## Q5:
+suspicious activity: Identify 1- 10 locations where you believe the suspicious activity is occurring, and why Please limit your response to 10 images and 500 words.
+
+
+
 
 

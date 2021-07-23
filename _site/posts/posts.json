@@ -14,10 +14,10 @@
       "R",
       "Visualization"
     ],
-    "contents": "\r\nDistill is a publication format for scientific and technical writing, native to the web.\r\nLearn more about using Distill at https://rstudio.github.io/distill.\r\n\r\n\r\n\r\n",
-    "preview": {},
-    "last_modified": "2021-07-23T23:00:09+08:00",
-    "input_file": {}
+    "contents": "\r\n\r\nContents\r\nQ1:\r\nmost popular locations:…\r\nAnomalies:\r\n\r\nQ2：\r\nQ3:\r\nQ4:\r\nQ5:\r\n\r\nQ1:\r\n以地点为单位 按照day的freq和price的热力图，分别看两个数据产生的热力图是否有不一致+两幅图联动选择； 按照24小时的热力图，单幅 hour*day的freq + 加上它是星期几的tooltip？ 交互的可以选择人和day的24小时的热力图？ 多个波动的折线图上下重叠？ 异常指数据异常，而不是可疑活动\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nmost popular locations:…\r\nNow, let’s divide the units from days into hours:\r\n\r\n\r\n\r\nAnomalies:\r\nQ2：\r\n画地图时，参考清华的Q3的流程 需要考虑的包，包括mapview，S8有写\r\nQ3:\r\nS9里的Bipartite：匹配信用卡和会员数据？ 美化可以参考-Parallel Sets of https://cheriewpq.shinyapps.io/isss608_group02/\r\nQ4:\r\n鉴别potential informal or unofficial relationships among GASTech personnel.\r\nQ5:\r\nsuspicious activity: Identify 1- 10 locations where you believe the suspicious activity is occurring, and why Please limit your response to 10 images and 500 words.\r\n\r\n\r\n\r\n",
+    "preview": "posts/2021-07-23-vast-challenge-2021-mc2/data/MC2-tourist.jpg",
+    "last_modified": "2021-07-23T23:04:16+08:00",
+    "input_file": "vast-challenge-2021-mc2.utf8.md"
   },
   {
     "path": "posts/2021-07-02-nyc-taxi-tip-prediction/",
