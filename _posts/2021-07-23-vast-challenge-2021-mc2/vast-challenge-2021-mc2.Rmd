@@ -23,7 +23,8 @@ preview: data/MC2-tourist.jpg
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE,
                       message = FALSE,
-                      warning = FALSE)
+                      warning = FALSE,
+                      R.options = list(width = 60))
 ```
 
 
@@ -150,7 +151,10 @@ p2 <- ggplot(freq_day_join,aes(x=day,y=location))+
 plotly::subplot(ggplotly(p1),
                 ggplotly(p2),
                 shareY = TRUE) %>% 
-  layout(annotations = list(x = 0.02 , y = 1.06, text = "Daily Frequency of Credit (left) and Loyalty (right) Card Usage", showarrow = F, xref='paper', yref='paper'))
+  layout(annotations = 
+           list(x = 0.02 , y = 1.06, 
+                text = "Daily Frequency of Credit (left) and Loyalty (right) Card Usage",
+                showarrow = F, xref='paper', yref='paper'))
 ```
 
 From the card usage frequency (or consumption frequency), we can easily identify that "Katerina’s Café", "Hippokampos" and "Brew've Been Served" are the most popular with almost all squares in deeper color, where the daily consumption frequency is above 10. 
@@ -162,6 +166,8 @@ On weekends, "Katerina’s Café" and "Hippokampos" are the most popular while o
 As for anomalies, we can see there is one white line in the graph for loyalty card, corresponding to "Daily Dealz". This location only have one credit card consumption record on day 13 and no loyalty card record among the two weeks.
 
 The daily frequencies are the same between "Maximum Iron and Steel" and "Kronos Pipe and Irrigation" every day in the two weeks.
+
+To correct these anomalies, we can check the GPS data to make sure who made the only one consumption in "Daily Dealz". If there were no anomalies after checking, we can just delete this single record in the credit card data. And for the situation between "Maximum Iron and Steel" and "Kronos Pipe and Irrigation", it's just coincidence after checking the consumption amount.
 
 
 Secondly, we can plot the consumption frequency under different hours instead of days. The steps are almost the same.
@@ -194,18 +200,25 @@ p2_price <- ggplot(price_day_join,aes(x=day,y=location))+
 plotly::subplot(ggplotly(p1_price),
         ggplotly(p2_price),
         shareY = TRUE) %>% 
-  layout(annotations = list(x = 0.02 , y = 1.06, text = "Hourly Frequency of Credit and Loyalty Card Usage", showarrow = F, xref='paper', yref='paper'))
-
+  layout(annotations = 
+           list(x = 0.02 , y = 1.06, 
+                text = "Hourly Frequency of Credit and Loyalty Card Usage",
+                showarrow = F, xref='paper', yref='paper'))
 ```
 
-#### most popular locations:...
+The consumption amount differences among locations are much bigger than frequency differences. 
 
+Apparently, "Abila Airport" are the place where has the biggest consumption amount. And these consumption occurred on weekdays only.
 
+Besides, "Stewart and Sons Fabrication", "Nationwide Refinery" and "Abila Airport" also have high consumption amounts on weekdays. All these locations don't show high frequency values in previous graphs but have very high daily consumption amounts.
 
-#### Anomalies:
+And there are many outliers which might be anomalies. For example, "Frydos Autosupply n' More" had a daily consumption amount in day 13 which is several times as much as those in other days.
 
+What's more, there are many inconsistencies between amounts in the credit card record and loyalty card record. At "Stewart and Sons Fabrication", the daily amounts from day 13 to day 16 don't match in two graphs.
 
-### Q2: Add vehical data to analyze the anomalies in Q1 and discrepancies between data
+To correct these anomalies, we need to check through the car movement data where the consumption amount outliers exist. It's to see whether there are activities or other gathering to cause the high consumption. As for the inconsistency in amounts, the possible explanations are there might be someone used only one of the two cards or got cashback in the consumption.
+
+### Q2: Add vehical data to analyze the anomalies and discrepancies between data
 
 画地图时，参考清华的Q3的流程
 需要考虑的包，包括mapview，S8有写
@@ -227,6 +240,7 @@ S9里的Bipartite：匹配信用卡和会员数据？
 suspicious activity: Identify 1- 10 locations where you believe the suspicious activity is occurring, and why Please limit your response to 10 images and 500 words.
 
 卡车，用于非商业活动的也算可疑活动
+解释可疑活动时，是以某人做了某件事为理由
 
 day*hour的图片
 Now, let's divide the units from days into hours:
