@@ -20,6 +20,7 @@
       <description>To visualize &amp; analyze card usage and car movement data with the employee disappearance incident</description>
       <category>R</category>
       <category>Visualization</category>
+      <category>Plotly</category>
       <guid>https://ygliu.netlify.app/posts/2021-07-23-vast-challenge-2021-mc2</guid>
       <pubDate>Fri, 23 Jul 2021 00:00:00 +0000</pubDate>
       <media:content url="https://ygliu.netlify.app/posts/2021-07-23-vast-challenge-2021-mc2/data/MC2-tourist.jpg" medium="image" type="image/jpeg"/>

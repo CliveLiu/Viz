@@ -17,6 +17,7 @@ output:
 categories:
   - R
   - Visualization
+  - Plotly
 preview: data/MC2-tourist.jpg
 ---
 
@@ -132,7 +133,7 @@ To identify popularity, we can calculate the card usage frequency and amount in 
 
 Firstly, let's plot the frequency of cards in the 14 days. We need to calculate the card usage frequency in different days, convert into data frame, draw their heatmaps and plot together.
 
-```{r, layout="l-body-outset"}
+```{r, layout="l-body-outset", code_folding=TRUE}
 # calculate the frequency data frame of credit and loyalty card usage
 cc_freq_day <- as.data.frame(xtabs(~location+day, data = cc))
 loyalty_freq_day <- as.data.frame(xtabs(~location+day, data = loyalty))
@@ -162,15 +163,16 @@ p2 <- ggplot(freq_day_join,aes(x=day,y=location))+
 plotly::subplot(ggplotly(p1),
                 ggplotly(p2),
                 shareY = TRUE) %>% 
-  layout(annotations = 
-           list(x = 0.02 , y = 1.06, 
-                text = "Daily Frequency of Credit (left) and Loyalty (right) Card Usage",
-                showarrow = F, xref='paper', yref='paper'))
+  layout(
+    title = list(
+      text = "Daily Frequency of Credit (left) and Loyalty (right) Card Usage",
+      xanchor = "center"),
+    font = list(size = 12))
 ```
 
-From the card usage frequency (or consumption frequency), we can easily identify that "Katerina’s Café", "Hippokampos" and "Brew've Been Served" are the most popular with almost all squares in deeper color, where the daily consumption frequency is above 10. 
+From the card usage frequency (or consumption frequency), we can easily identify that "Katerina’s Café", "Hippokampos" and "Brew've Been Served" are the most popular with almost all squares in deeper color, where the daily consumption frequency is above 10. "Hallowed Grounds" and "Guy's Gyros" are slightly less popular.
 
-Besides, we can find that "Brew've Been Served" are popular every day except weekends (day 11-12, 18-19). The frequency are 0 on weekends, which might because the location is closed on weekends. It's the same to "Hallowed Grounds".
+Besides, we can find that "Brew've Been Served" and "Hallowed Grounds" are popular every day except weekends (day 11-12, 18-19). The frequency are 0 on weekends, which might because the location is closed on weekends. It's the same to "Hallowed Grounds".
 
 On weekends, "Katerina’s Café" and "Hippokampos" are the most popular while other locations might be closed or less consumption these days.
 
@@ -181,7 +183,7 @@ The daily frequencies are the same between "Maximum Iron and Steel" and "Kronos 
 To correct these anomalies, we can check the GPS data to make sure who made the only one consumption in "Daily Dealz". If there were no anomalies after checking, we can just delete this single record in the credit card data. And for the situation between "Maximum Iron and Steel" and "Kronos Pipe and Irrigation", it's just coincidence after checking the consumption amount.
 
 
-Secondly, we can plot the consumption frequency under different hours instead of days. The steps are almost the same.
+Secondly, we can plot the consumption amount instead of frequency. The steps are almost the same.
 
 ```{r, layout="l-body-outset"}
 cc_price_matrix <- tapply(cc$price,cc[,c("location","day")],sum)
@@ -211,10 +213,10 @@ p2_price <- ggplot(price_day_join,aes(x=day,y=location))+
 plotly::subplot(ggplotly(p1_price),
         ggplotly(p2_price),
         shareY = TRUE) %>% 
-  layout(annotations = 
-           list(x = 0.02 , y = 1.06, 
-                text = "Hourly Frequency of Credit and Loyalty Card Usage",
-                showarrow = F, xref='paper', yref='paper'))
+  layout(
+    title = list(text = "Daily Consumption Amount of Credit and Loyalty Card",
+                 xanchor = "center"),
+    font = list(size = 12))
 ```
 
 The consumption amount differences among locations are much bigger than frequency differences. 
@@ -223,11 +225,71 @@ Apparently, "Abila Airport" are the place where has the biggest consumption amou
 
 Besides, "Stewart and Sons Fabrication", "Nationwide Refinery" and "Abila Airport" also have high consumption amounts on weekdays. All these locations don't show high frequency values in previous graphs but have very high daily consumption amounts.
 
-And there are many outliers which might be anomalies. For example, "Frydos Autosupply n' More" had a daily consumption amount in day 13 which is several times as much as those in other days.
+And there are many outliers which might be anomalies. For example, "Frydos Autosupply n' More" had a daily cc consumption amount ($10455.22) in day 13, which is several times as much as those in other days. And the loyalty consumption amount in day 8 at "Nationwide Refinery" is 12554.91.
 
 What's more, there are many inconsistencies between amounts in the credit card record and loyalty card record. At "Stewart and Sons Fabrication", the daily amounts from day 13 to day 16 don't match in two graphs.
 
 To correct these anomalies, we need to check through the car movement data where the consumption amount outliers exist. It's to see whether there are activities or other gathering to cause the high consumption. As for the inconsistency in amounts, the possible explanations are there might be someone used only one of the two cards or got cashback in the consumption.
+
+
+Lastly, we change the time unit from days to hours to analyze the popular locations. Only the timestamp of credit card data contains time, so there are no hourly heatmaps for loyalty card usage.
+
+```{r, eval=FALSE, echo=FALSE}
+p3_freq_ <- ggplot(cc_hour_join,aes(x=hour, y=location, 
+                                    text=paste("Amount:", Amount)))+
+  geom_tile(aes(fill=Freq))+
+  scale_fill_gradient(low = "#deeff7", high = "#0D2330")+
+  theme(panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank())
+ggplotly(p3_freq_)
+```
+
+
+```{r, layout="l-body-outset"}
+cc_freq_hour <- as.data.frame(xtabs(~location+hour, data = cc))
+# convert factor into number
+cc_freq_hour$hour <- as.numeric(levels(cc_freq_hour$hour))[cc_freq_hour$hour]
+
+cc_price_hour_matrix <- tapply(cc$price,cc[,c("location","hour")],sum)
+cc_price_hour <- reshape2::melt(cc_price_hour_matrix)
+
+cc_hour_join <- full_join(cc_freq_hour, cc_price_hour, by= c("location","hour"))
+names(cc_hour_join) <- c("location","hour","Freq","Amount")
+
+p3_freq <- ggplot(cc_hour_join,aes(x=hour,y=location))+
+  geom_tile(aes(fill=Freq))+
+  scale_fill_gradient(low = "#deeff7", high = "#0D2330")+
+  theme(panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank())
+
+p3_price <- ggplot(cc_hour_join,aes(x=hour,y=location))+
+  geom_tile(aes(fill=Amount))+
+  scale_fill_gradient(low = "#deeff7", high = "#0D2330")+
+  theme(panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank())
+
+plotly::subplot(ggplotly(p3_freq),
+        ggplotly(p3_price),
+        shareY = TRUE) %>% 
+  hide_colorbar() %>% 
+  layout(
+    title = list(text = "Hourly Consumption Frequency and Amount of Credit Card",
+                 xanchor = "center"),
+    font = list(size = 12))
+```
+
+From the left hourly heatmap, we can easily identify the popular period for each locations since there are clear pattern. 
+
+* Breakfast time (7am to 8am): "Brew've Been Served", "Hallowed Grounds"
+* Lunch time (12pm to 1pm): "Katerina’s Café", "Hippokampos", "Abila Zacharo"
+* Dinner time (7pm to 8pm): "Katerina’s Café", "Hippokampos", "Guy's Gyros"
+
+And some anomalies exist in the strange time period. At 3am, there are 5 credit card usages in "Kronos Mart". For "Daily Dealz", the only credit card transaction happened at 6am.
+
+The right heatmaps also show anomalies: A very high consumption amount ($32419.63) happened at 11am of "Stewart and Sons Fabrication".
 
 ### Q2: Add vehical data to analyze the anomalies and discrepancies between data
 
@@ -258,7 +320,7 @@ tm_shape(bgmap) +
 
 Then...
 
-```{r}
+```{r, layout="l-body-outset"}
 gps_sf <- st_as_sf(gps,
                    coords = c("long", "lat"), # combine the lo, la
                    crs = 4326) # 4326 is wgs84 Geographic Coordinate System
@@ -296,10 +358,32 @@ S9里的Bipartite：匹配信用卡和会员数据？
 定义所有car stop大于1分钟的作为一次stop，找出所有stop的gps定位。得到停车的开始结束时间+stop的定位
 和cc的数据全连接，然后统计匹配航叔的频次？画出Bipartite？
 
+```{r, layout="l-body-outset"}
+1
+```
+```{r, layout="l-body-outset"}
+1
+```
+```{r, layout="l-body-outset"}
+1
+```
+
 ### Q4: Identify potential informal relationships amoung GASTech personnel with evidence
 鉴别potential informal or unofficial relationships among GASTech personnel.
+```{r, layout="l-body-outset"}
+1
+```
+```{r, layout="l-body-outset"}
+1
+```
 
 ### Q5: Identify locations where might be suspicious activity with evidence
+```{r, layout="l-body-outset"}
+1
+```
+```{r, layout="l-body-outset"}
+1
+```
 
 suspicious activity: Identify 1- 10 locations where you believe the suspicious activity is occurring, and why Please limit your response to 10 images and 500 words.
 
