@@ -63,79 +63,108 @@ However, almost all graphs were static and readers would find it difficult to ex
 
 ## Data Preparation
 
-Extracting, wrangling and preparing the input data required to perform the analysis. The focus should be on exploring appropriate **tidyverse** methods
+### Data Wrangling
 
-### QGIS
-
-
-
-## Visualization and Insights
-
-### Q1:
-以地点为单位
-按照day的freq和price的热力图，分别看两个数据产生的热力图是否有不一致+两幅图联动选择；
-按照24小时的热力图，单幅
-hour*day的freq + 加上它是星期几的tooltip？
-交互的可以选择人和day的24小时的热力图？
-多个波动的折线图上下重叠？
-异常指数据异常，而不是可疑活动
+Import packages needed firstly.
 
 ```{r}
 library(tidyverse)
-library(ggplot2)
 library(lubridate)
-library(dplyr)
-library(plotly)
 ```
 
+The location names contain some special characters, such as "Café", which are not recognized by utf-8 encoding. Thus, special encoding is used in reading data.
 
 ```{r}
 loyalty <- read_csv("data/loyalty_data.csv", locale=locale(encoding ="windows-1252"))
 cc <- read_csv("data/cc_data.csv", locale=locale(encoding ="windows-1252"))
 ```
 
+The timestamp in the credit card usage date ("cc") contains date and time, while the timestamp in the loyal card usage data ("loyalty") contains only data. Besides, their data type is string, which will be transformed into datetime type.
+
+And we separate day, hour from the datetime feature.
+
 ```{r}
-# convert str into date/time
 loyalty$timestamp <- as.Date(loyalty$timestamp, "%m/%d/%Y")
+cc$timestamp <- strptime(cc$timestamp, "%m/%d/%Y %H:%M")
+
 loyalty$day <- mday(loyalty$timestamp)
-cc$datetime <- strptime(cc$timestamp, "%m/%d/%Y %H:%M")
 cc$date <- as.Date(cc$timestamp, "%m/%d/%Y %H:%M")
 cc$day <- mday(cc$date)
-cc$hour <- hour(cc$datetime)
+cc$hour <- hour(cc$timestamp)
 ```
 
 
+### QGIS
+
+The tourist map provided is not georeferenced. And [QGIS](https://qgis.org/en/site/) can help to georeference an image with the ESRI shapefiles (geospatial vector data) of the city.
+
+The process includes:
+
+1. load JPG tourist map and shp road map
+2. create several referencing points between two maps
+3. start georeferencing maps and check the correspondence
+
+After the process, we will get a tif file which is a combination of tourist map and georeferenced. road map. Then we can plot car movements line with longitude and latitude data on the map.
+
+## Visualization and Insights
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(plotly)
+```
+
+### Q1: Identify popular locations and anomalies
+
+To identify popularity, we can calculate the card usage frequency and amount in every locations of different days and hours.
+
+Firstly, let's plot the frequency of cards in the 14 days. We need to calculate the card usage frequency in different days, convert into data frame, draw their heatmaps and plot together.
 
 ```{r, layout="l-body-outset"}
-cc_freq_day <- as.data.frame(xtabs(~location+day, data = cc)) # 二维列联表
-loyalty_freq_day <- as.data.frame(xtabs(~location+day, data = loyalty)) # 二维列联表
+# calculate the frequency data frame of credit and loyalty card usage
+cc_freq_day <- as.data.frame(xtabs(~location+day, data = cc))
+loyalty_freq_day <- as.data.frame(xtabs(~location+day, data = loyalty))
 
+# join the two frequency data frame
 freq_day_join <- full_join(cc_freq_day,loyalty_freq_day,by= c("location","day"))
 names(freq_day_join) <- c("location","day","CC_Freq","Loyalty_Freq")
 # transfer from factors to numeric with original values
 freq_day_join$day <- as.numeric(levels(freq_day_join$day))[freq_day_join$day]
-dt_freq_day <- highlight(freq_day_join)
-p1 <- ggplot(dt_freq_day,aes(x=day,y=location))+
+# plot the heatmap of credit card usage frequency 
+p1 <- ggplot(freq_day_join,aes(x=day,y=location))+
   geom_tile(aes(fill=CC_Freq))+
   scale_fill_gradient(low = "#deeff7", high = "#0D2330")+
   theme(panel.background = element_blank(),
         axis.ticks = element_blank(),
         axis.title = element_blank(),
         legend.title=element_blank())
-
-p2 <- ggplot(dt_freq_day,aes(x=day,y=location))+
+# plot the heatmap of loyalty card usage frequency 
+p2 <- ggplot(freq_day_join,aes(x=day,y=location))+
   geom_tile(aes(fill=Loyalty_Freq))+
   scale_fill_gradient(low = "#deeff7", high = "#0D2330")+
   theme(panel.background = element_blank(),
         axis.ticks = element_blank(),
         axis.title = element_blank(),
         legend.title=element_blank())
-
+# convert static graph into interactive
 plotly::subplot(ggplotly(p1),
                 ggplotly(p2),
                 shareY = TRUE) %>% 
-  layout(annotations = list(x = 0.02 , y = 1.06, text = "Usage Frequency of Credit (left) and Loyalty (right) Card", showarrow = F, xref='paper', yref='paper'))
+  layout(annotations = list(x = 0.02 , y = 1.06, text = "Daily Frequency of Credit (left) and Loyalty (right) Card Usage", showarrow = F, xref='paper', yref='paper'))
 ```
+
+From the card usage frequency (or consumption frequency), we can easily identify that "Katerina’s Café", "Hippokampos" and "Brew've Been Served" are the most popular with almost all squares in deeper color, where the daily consumption frequency is above 10. 
+
+Besides, we can find that "Brew've Been Served" are popular every day except weekends (day 11-12, 18-19). The frequency are 0 on weekends, which might because the location is closed on weekends. It's the same to "Hallowed Grounds".
+
+On weekends, "Katerina’s Café" and "Hippokampos" are the most popular while other locations might be closed or less consumption these days.
+
+As for anomalies, we can see there is one white line in the graph for loyalty card, corresponding to "Daily Dealz". This location only have one credit card consumption record on day 13 and no loyalty card record among the two weeks.
+
+The daily frequencies are the same between "Maximum Iron and Steel" and "Kronos Pipe and Irrigation" every day in the two weeks.
+
+
+Secondly, we can plot the consumption frequency under different hours instead of days. The steps are almost the same.
 
 ```{r, layout="l-body-outset"}
 cc_price_matrix <- tapply(cc$price,cc[,c("location","day")],sum)
@@ -146,8 +175,7 @@ loyalty_price <- reshape2::melt(loyalty_price_matrix)
 
 price_day_join <- full_join(cc_price,loyalty_price,by= c("location","day"))
 names(price_day_join) <- c("location","day","Price.","Price")
-# price_day_join$Price.[is.na(price_day_join$Price.)] <- 0
-# price_day_join$Price[is.na(price_day_join$Price)] <- 0
+
 p1_price <- ggplot(price_day_join,aes(x=day,y=location))+
   geom_tile(aes(fill=Price.))+
   scale_fill_gradient(low = "#deeff7", high = "#0D2330")+
@@ -165,12 +193,42 @@ p2_price <- ggplot(price_day_join,aes(x=day,y=location))+
 
 plotly::subplot(ggplotly(p1_price),
         ggplotly(p2_price),
-        shareY = TRUE)
+        shareY = TRUE) %>% 
+  layout(annotations = list(x = 0.02 , y = 1.06, text = "Hourly Frequency of Credit and Loyalty Card Usage", showarrow = F, xref='paper', yref='paper'))
 
 ```
 
 #### most popular locations:...
 
+
+
+#### Anomalies:
+
+
+### Q2: Add vehical data to analyze the anomalies in Q1 and discrepancies between data
+
+画地图时，参考清华的Q3的流程
+需要考虑的包，包括mapview，S8有写
+
+数据差异的话，除了图一图二中的，还有卡的对应关系不一致，车的数据和卡的数据
+
+
+### Q3: Infer the owners of credit and loyalty card, as well as evidence and uncertainties
+S9里的Bipartite：匹配信用卡和会员数据？
+美化可以参考-Parallel Sets of https://cheriewpq.shinyapps.io/isss608_group02/
+定义所有car stop大于1分钟的作为一次stop，找出所有stop的gps定位。得到停车的开始结束时间+stop的定位
+和cc的数据全连接，然后统计匹配航叔的频次？画出Bipartite？
+
+### Q4: Identify potential informal relationships amoung GASTech personnel with evidence
+鉴别potential informal or unofficial relationships among GASTech personnel.
+
+### Q5: Identify locations where might be suspicious activity with evidence
+
+suspicious activity: Identify 1- 10 locations where you believe the suspicious activity is occurring, and why Please limit your response to 10 images and 500 words.
+
+卡车，用于非商业活动的也算可疑活动
+
+day*hour的图片
 Now, let's divide the units from days into hours:
 
 ```{r, layout="l-screen", fig.height=10}
@@ -188,32 +246,6 @@ p3 <- ggplot(cc_freq_day_hour,aes(x=hour,y=location))+
   labs(title = "CC Frequency by hour of the day") 
 ggplotly(p3)
 ```
-
-
-
-#### Anomalies:
-
-
-### Q2：
-画地图时，参考清华的Q3的流程
-需要考虑的包，包括mapview，S8有写
-
-
-### Q3:
-S9里的Bipartite：匹配信用卡和会员数据？
-美化可以参考-Parallel Sets of https://cheriewpq.shinyapps.io/isss608_group02/
-定义所有car stop大于1分钟的作为一次stop，找出所有stop的gps定位。得到停车的开始结束时间+stop的定位
-和cc的数据全连接，然后统计匹配航叔的频次？画出Bipartite？
-
-### Q4:
-鉴别potential informal or unofficial relationships among GASTech personnel.
-
-### Q5:
-suspicious activity: Identify 1- 10 locations where you believe the suspicious activity is occurring, and why Please limit your response to 10 images and 500 words.
-
-卡车，用于非商业活动的也算可疑活动
-
-day*hour的图片
 
 ## Conclusion
 
