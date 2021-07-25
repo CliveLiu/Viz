@@ -62,7 +62,7 @@ x <- "test 2"
 word testword testword testword testword testword testword testword testword testword test
 
 
-```{r, layout='l-body-outset', echo = TRUE}
+```{r, layout='l-body-outset', echo = TRUE, code_folding="True"}
 #library(rmarkdown)
 #paged_table(py$raw, options = list(rows.print = 5))
 print('xxxx')
