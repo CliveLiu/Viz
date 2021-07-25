@@ -23,9 +23,9 @@ preview: data/MC2-tourist.jpg
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE,
+                      eval = TRUE,
                       message = FALSE,
-                      warning = FALSE,
-                      R.options = list(width = 60))
+                      warning = FALSE)
 ```
 
 
@@ -33,9 +33,13 @@ knitr::opts_chunk$set(echo = TRUE,
 
 This study is based on the [Mini-Challenge 2](https://vast-challenge.github.io/2021/MC2.html) of the [VAST Challenge 2021](https://vast-challenge.github.io/2021/). In a fiction scenario, there is a natural gas company named "GASTech" operating in the island country if Kronos. The GASTech didn't do well in environment stewardship. And after an company IPO celebration in January 2014, several employees of GASTech went missing. An environment organization is suspected in the disappearance.
 
-Many of the Abila, Kronos-based employees of GAStech have company cars which are approved for both personal and business use. And the others who don't have company cars can check and use company trucks for business use. The GPS tracking data of these company vehicles is available for the two weeks prior the disappearance.
+Many of the Abila, Kronos-based employees of GAStech have company cars which are approved for both personal and business use. Those who do not have company cars have the ability to check out company trucks for business use, but these trucks cannot be used for personal business.
 
-And the company also provides a loyalty card to employees to give them discounts in the local businesses. And their credit card purchases and loyalty cards usage data are provided. But these data does not have persona information beyond purchases.
+Employees with company cars are happy to have these vehicles, because the company cars are generally much higher quality than the cars they would be able to afford otherwise. However, GAStech does not trust their employees. Without the employees? knowledge, GAStech has installed geospatial tracking software in the company vehicles. The vehicles are tracked periodically as long as they are moving.
+
+This vehicle tracking data has been made available to law enforcement to support their investigation. Unfortunately, data is not available for the day the GAStech employees went missing. Data is only available for the two weeks prior to the disappearance.
+
+To promote local businesses, Kronos based companies provide a Kronos Kares benefit card to GASTech employees giving them discounts and rewards in exchange for collecting information about their credit card purchases and preferences as recorded on loyalty cards. This data has been made available to investigators in the hopes that it can help resolve the situation. However, Kronos Kares does not collect personal information beyond purchases.
 
 ### Requirement
 
@@ -74,6 +78,7 @@ library(tidyverse)
 library(lubridate)
 library(raster)
 library(sf)
+library(tidyr)
 ```
 
 The location names contain some special characters, such as "Café", which are not recognized by utf-8 encoding. Thus, special encoding is used in reading data.
@@ -208,13 +213,15 @@ library(dplyr)
 library(plotly)
 ```
 
-### Q1: Identify popular locations and anomalies
+### Q1: Popular locations
+
+> Using just the credit and loyalty card data, identify the most popular locations, and when they are popular. What anomalies do you see? What corrections would you recommend to correct these anomalies? 
 
 To identify popularity, we can calculate the card usage frequency and amount in every locations of different days and hours.
 
 Firstly, let's plot the frequency of cards in the 14 days. We need to calculate the card usage frequency in different days, convert into data frame, draw their heatmaps and plot together.
 
-```{r q1f1 , layout="l-body-outset", fig.cap = "Daily Frequency of Credit (left) and Loyalty (right) Card Usage", code_folding="Q1-Fig1"}
+```{r q1f1, layout="l-body-outset", fig.cap = "Daily Frequency of Credit (left) and Loyalty (right) Card Usage", code_folding="Q1-Fig1"}
 # calculate the frequency data frame of credit and loyalty card usage
 cc_freq_day <- as.data.frame(xtabs(~location+day, data = cc))
 loyalty_freq_day <- as.data.frame(xtabs(~location+day, data = loyalty))
@@ -243,12 +250,7 @@ p2 <- ggplot(freq_day_join,aes(x=day,y=location))+
 # convert static graph into interactive
 plotly::subplot(ggplotly(p1),
                 ggplotly(p2),
-                shareY = TRUE) %>% 
-  layout(
-    title = list(
-      text = "Daily Frequency of Credit (left) and Loyalty (right) Card Usage",
-      xanchor = "center"),
-    font = list(size = 12))
+                shareY = TRUE)
 ```
 
 From the card usage frequency (or consumption frequency), we can easily identify that "Katerina’s Café", "Hippokampos" and "Brew've Been Served" are the most popular with almost all squares in deeper color, where the daily consumption frequency is above 10. "Hallowed Grounds" and "Guy's Gyros" are slightly less popular.
@@ -272,7 +274,7 @@ Secondly, we can plot the consumption amount instead of frequency. The steps are
 ```
 
 
-```{r q1f2 , layout="l-body-outset", fig.cap="Daily Consumption Amount of Credit and Loyalty Card", code_folding="Q1-Fig2"}
+```{r q1f2, layout="l-body-outset", fig.cap="Daily Consumption Amount of Credit and Loyalty Card", code_folding="Q1-Fig2"}
 cc_price_matrix <- tapply(cc$price,cc[,c("location","day")],sum)
 cc_price <- reshape2::melt(cc_price_matrix)
 
@@ -299,11 +301,7 @@ p2_price <- ggplot(price_day_join,aes(x=day,y=location))+
 
 plotly::subplot(ggplotly(p1_price),
         ggplotly(p2_price),
-        shareY = TRUE) %>% 
-  layout(
-    title = list(text = "Daily Consumption Amount of Credit and Loyalty Card",
-                 xanchor = "center"),
-    font = list(size = 12))
+        shareY = TRUE)
 ```
 
 The consumption amount differences among locations are much bigger than frequency differences. 
@@ -322,14 +320,7 @@ To correct these anomalies, we need to check through the car movement data where
 Lastly, we change the time unit from days to hours to analyze the popular locations. Only the timestamp of credit card data contains time, so there are no hourly heatmaps for loyalty card usage.
 
 ```{r, eval=FALSE, echo=FALSE}
-p3_freq_ <- ggplot(cc_hour_join,aes(x=hour, y=location, 
-                                    text=paste("Amount:", Amount)))+
-  geom_tile(aes(fill=Freq))+
-  scale_fill_gradient(low = "#deeff7", high = "#0D2330")+
-  theme(panel.background = element_blank(),
-        axis.ticks = element_blank(),
-        axis.title = element_blank())
-ggplotly(p3_freq_)
+
 ```
 
 
@@ -361,11 +352,7 @@ p3_price <- ggplot(cc_hour_join,aes(x=hour,y=location))+
 plotly::subplot(ggplotly(p3_freq),
         ggplotly(p3_price),
         shareY = TRUE) %>% 
-  hide_colorbar() %>% 
-  layout(
-    title = list(text = "Hourly Consumption Frequency and Amount of Credit Card",
-                 xanchor = "center"),
-    font = list(size = 12))
+  hide_colorbar()
 ```
 
 From the left hourly heatmap, we can easily identify the popular period for each locations since there are clear pattern. 
@@ -378,7 +365,9 @@ And some anomalies exist in the strange time period. At 3am, there are 5 credit 
 
 The right heatmaps also show anomalies: A very high consumption amount ($32419.63) happened at 11am of "Stewart and Sons Fabrication".
 
-### Q2: Add vehical data to analyze the anomalies and discrepancies between data
+### Q2: Add vehical data
+
+> Add the vehicle data to your analysis of the credit and loyalty card data. How does your assessment of the anomalies in question 1 change based on this new data? What discrepancies between vehicle, credit, and loyalty card data do you find?
 
 ```{r}
 packages = c('raster', 'sf', 
@@ -486,7 +475,7 @@ knitr::kable(cc %>%
 ```
 
 
-The strange consumption occurred at 3 o'clock on day 19 by the owner of credit cards 3484, 9551, 8332.
+The strange consumption records are the last 3 rows, which occurred at 3 o'clock on day 19 by the owner of credit cards 3484, 9551, 8332.
 
 Coincidentally, credit card 9551 also appeared in the Anomaly 1.
 
@@ -529,7 +518,7 @@ stop_day18$id <- as.numeric(stop_day18$id)
 
 knitr::kable(left_join(stop_day18, car_assignments, by = c("id" = "CarID")),
              caption = "The three car stop near Kronos Mart") %>% 
-  kableExtra::kable_paper("hover")
+  kableExtra::kable_paper("hover", full_width=T)
 ```
 
 We can't get insights from the car owner information since they belong to different employment type. But they stayed at the same location for similar time period. They are very likely to meet each other and do the same thing. Besides, the consumption at 3 o'clock came from 3 credit cards and this meetup also involved in 3 persons.
@@ -540,58 +529,161 @@ Another possible explanation direction could be persons just stayed near the mar
 
 This suspicious activities will be analyzed further in question 5. It might need to check the behaviors of the three car owners in the 14 days.
 
-##### discrepancies
-
-画地图时，参考清华的Q3的流程
-
-数据差异的话，除了图一图二中的，还有卡的对应关系不一致，车的数据和卡的数据
+##### Discrepancies between data
 
 
-### Q3: Infer the owners of credit and loyalty card, as well as evidence and uncertainties
-S9里的Bipartite：匹配信用卡和会员数据？
-美化可以参考-Parallel Sets of https://cheriewpq.shinyapps.io/isss608_group02/
-定义所有car stop大于1分钟的作为一次stop，找出所有stop的gps定位。得到停车的开始结束时间+stop的定位
-和cc的数据全连接，然后统计匹配航叔的频次？画出Bipartite？
-
-```{r q3f1, layout="l-body-outset", fig.cap="", code_folding="Q1-Fig1"}
-1
-```
-```{r q3f2, layout="l-body-outset", fig.cap="", code_folding="Q1-Fig1"}
-1
-```
-```{r q3f3, layout="l-body-outset", fig.cap="", code_folding="Q1-Fig1"}
-1
+```{r}
+cc_num <- length(unique(cc$last4ccnum))
+loyalty_num <- length(unique(loyalty$loyaltynum))
+ppl_num <- length(car_assignments$LastName)
+c(cc_num, loyalty_num, ppl_num)
 ```
 
-### Q4: Identify potential informal relationships amoung GASTech personnel with evidence
-鉴别potential informal or unofficial relationships among GASTech personnel.
-```{r q4f1, layout="l-body-outset", fig.cap="", code_folding="Q1-Fig1"}
+We can find that there are 44 employees, but 54 loyalty cards and 55 credit cards. If we ignore possible errors in the card number records, one employee has one or more credit cards and one or more loyalty cards.
+
+
+
+### Q3: Infer card owners
+
+> Can you infer the owners of each credit card and loyalty card? What is your evidence? Where are there uncertainties in your method? Where are there uncertainties in the data? 
+
+If one consumption time fall with one car stop period, we believe it's possible one correspondence. There might be several different purchase in one car stop period, but we can infer that the most common pair within one group is the most likely true pair.
+
+The credit card data contain specific time, but loyalty card data doesn't. Thus, We will find the relationship between credit cards and loyalty cards. After that, we will match the credit card and car stop. The owners of loyalty card can be inferred from the relationship between credit card and car stop and the relationship between credit cards and loyalty cards.
+
+We full join the two card table by matching day, location and price. It's seldom that two different consumption will have the same values in the three features. Then, we use `group_by()` to find all pairs of two cards and count the consumption frequency of the pair.
+
+There will be some rows which can't match. This might be someone used only one of the two cards or got cashback. We filter out these situations, where the card pair contains null value.
+
+```{r}
+# # make a full join
+card_correspond_count <- full_join(cc, loyalty,
+                             by = c("day", "location", "price")) %>%
+  # calculate frequency
+  group_by(last4ccnum, loyaltynum) %>%
+  summarise(count = n()) %>%
+  # filter out mismatch
+  drop_na()
+
+# convert 'last4ccnum' into string to plot 
+card_correspond_count$last4ccnum <- as.character(card_correspond_count$last4ccnum)
+```
+
+Most pairs are one-on-one. It's confident to conclude there pairs are true (credit and loyalty card in each pair belong to one owner).
+
+```{r}
+card_correspond_count_one2one <- card_correspond_count %>% 
+  filter((n_distinct(last4ccnum)==1 & n_distinct(loyaltynum)==1))
+
+knitr::kable(card_correspond_count_one2one,
+             caption = "One-on-one matched pairs") %>% 
+  kableExtra::kable_paper("hover", full_width = F) %>% 
+  kableExtra::scroll_box(height = "300px")
+```
+
+For those who have matched but not one-on-one, we can plot their parallel graph.
+
+```{r q3f1, fig.cap="Not one-on-one matched pairs", code_folding="Q3-Fig1", fig.width=8}
+library(ggalluvial)
+# filter multiple match
+card_correspond_count_others <- card_correspond_count %>% 
+  filter(n_distinct(last4ccnum)>1 | n_distinct(loyaltynum)>1)
+# plot
+ggplot(card_correspond_count_others,
+       aes(y = count, axis1 = last4ccnum, axis2 = loyaltynum)) +
+  geom_alluvium(aes(fill = last4ccnum), width = 1/12) +
+  geom_stratum(width = 1/12, fill = "transparent", color = "grey") +
+  geom_label(stat = "stratum", aes(label = after_stat(stratum))) +
+  scale_x_discrete(limits = c("last4ccnum", "loyaltynum"), expand = c(.05, .05)) +
+  scale_fill_brewer(type = "qual", palette = "Set1") + 
+  theme(legend.position = "none",
+        axis.line = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.y = element_blank(),
+        panel.background = element_blank())
+```
+
+We can infer that the pair with a wider line is the true pair. For example, credit card 4795 (Blue line) matches both L2070 and L8566 loyalty cards, but we can make sure that L8566 is the true pair. Because the the consumption count by L8566, which is displayed as the line width, is much higher than L2070.
+
+
+```{r}
+knitr::kable(card_correspond_count_others,
+             caption = "Other matched pairs") %>% 
+  kableExtra::kable_paper("hover", full_width = F) %>% 
+  kableExtra::scroll_box(height = "300px")
+```
+
+These matched pairs with 1 count might contain some suspicious activities. And we can assign the rows with over 5 count to be true pairs.
+
+```{r}
+card_correspond_count_others_ture <- card_correspond_count_others %>% 
+  filter(count > 5)
+# union the two true pairs table
+card_correspond_true <- bind_rows(card_correspond_count_one2one, card_correspond_count_others_ture)
+```
+
+```{r}
+ggplot(card_correspond_true,
+       aes(y = 1, axis1 = last4ccnum, axis2 = loyaltynum)) +
+  geom_alluvium(width = 1/10000) +
+  # geom_stratum(width = 1/12, fill = "transparent", color = "grey") +
+  geom_label(stat = "stratum", aes(label = after_stat(stratum))) +
+  scale_x_discrete(limits = c("last4ccnum", "loyaltynum"), expand = c(.05, .05)) +
+  scale_fill_brewer(type = "qual", palette = "Set1") + 
+  theme(legend.position = "none",
+        axis.line = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.y = element_blank(),
+        panel.background = element_blank())
+```
+
+
+Now we will math
+
+```{r q3f2, layout="l-body-outset", fig.cap="", code_folding="Q3-Fig2"}
 1
 ```
-```{r q4f2, layout="l-body-outset", fig.cap="", code_folding="Q1-Fig1"}
-1
-```
-```{r q4f3, layout="l-body-outset", fig.cap="", code_folding="Q1-Fig1"}
+```{r q3f3, layout="l-body-outset", fig.cap="", code_folding="Q3-Fig3"}
 1
 ```
 
-### Q5: Identify locations where might be suspicious activity with evidence
-```{r q5f1, layout="l-body-outset", fig.cap="", code_folding="Q1-Fig1"}
+### Q4: Potential informal relationships
+
+> Given the data sources provided, identify potential informal or unofficial relationships among GASTech personnel. Provide evidence for these relationships
+
+
+```{r q4f1, layout="l-body-outset", fig.cap="", code_folding="Q4-Fig1"}
 1
 ```
-```{r q5f2, layout="l-body-outset", fig.cap="", code_folding="Q1-Fig1"}
+```{r q4f2, layout="l-body-outset", fig.cap="", code_folding="Q4-Fig2"}
 1
 ```
-```{r q5f3, layout="l-body-outset", fig.cap="", code_folding="Q1-Fig1"}
+```{r q4f3, layout="l-body-outset", fig.cap="", code_folding="Q4-Fig3"}
 1
 ```
 
-suspicious activity: Identify 1- 10 locations where you believe the suspicious activity is occurring, and why Please limit your response to 10 images and 500 words.
 
-卡车，用于非商业活动的也算可疑活动
-解释可疑活动时，是以某人做了某件事为理由
+### Q5: Identify suspicious activity
 
-day*hour的图片
+> Do you see evidence of suspicious activity? Identify 1- 10 locations where you believe the suspicious activity is occurring, and why.
+
+
+```{r q5f1, layout="l-body-outset", fig.cap="", code_folding="Q5-Fig1"}
+1
+```
+```{r q5f2, layout="l-body-outset", fig.cap="", code_folding="Q5-Fig2"}
+1
+```
+```{r q5f3, layout="l-body-outset", fig.cap="", code_folding="Q5-Fig3"}
+1
+```
+
+trucks which were used for non-business issue
+
+
+day*hour
 Now, let's divide the units from days into hours:
 
 ```{r, layout="l-page", fig.height=10}
@@ -613,7 +705,8 @@ ggplotly(p3)
 ## Conclusion
 
 ```{r}
-knitr::kable(loyalty) %>% 
-  kableExtra::kable_paper("hover", full_width = F)
+# knitr::kable(card_correspong_count,
+#              caption = ) %>%
+#   kableExtra::kable_paper("hover", full_width = F)
 
 ```
