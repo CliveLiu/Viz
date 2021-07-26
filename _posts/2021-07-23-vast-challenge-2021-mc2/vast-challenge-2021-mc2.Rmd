@@ -211,6 +211,10 @@ bgmap <- raster("data/Geospatial/MC2-tourist.tif")
 library(ggplot2)
 library(dplyr)
 library(plotly)
+library(sf)
+library(tmap)
+library(clock)
+library(ggforce)
 ```
 
 ### Q1: Popular locations
@@ -368,17 +372,6 @@ The right heatmaps also show anomalies: A very high consumption amount ($32419.6
 ### Q2: Add vehical data
 
 > Add the vehicle data to your analysis of the credit and loyalty card data. How does your assessment of the anomalies in question 1 change based on this new data? What discrepancies between vehicle, credit, and loyalty card data do you find?
-
-```{r}
-packages = c('raster', 'sf', 
-             'tmap', 'clock')
-for (p in packages){
-  if(!require(p, character.only = T)){
-    install.packages(p)
-  }
-  library(p,character.only = T)
-}
-```
 
 
 ##### Anomaly 1: High consumption at "Frydos Autosupply n' More" on day 13, Figure \@ref(fig:q1f2)
@@ -539,7 +532,11 @@ ppl_num <- length(car_assignments$LastName)
 c(cc_num, loyalty_num, ppl_num)
 ```
 
-We can find that there are 44 employees, but 54 loyalty cards and 55 credit cards. If we ignore possible errors in the card number records, one employee has one or more credit cards and one or more loyalty cards.
+We can find that there are 44 employees, but 55 credit cards and 54 loyalty cards. If we suppose no errors in the card id, one employee has one or more credit cards and one or more loyalty cards.
+
+
+<!-- ######################################### -->
+<!-- check the one car No GPS data visible before the 17th? -->
 
 
 
@@ -583,10 +580,10 @@ knitr::kable(card_correspond_count_one2one,
 
 For those who have matched but not one-on-one, we can plot their parallel graph.
 
-```{r q3f1, fig.cap="Not one-on-one matched pairs", code_folding="Q3-Fig1", fig.width=8}
+```{r , eval=FALSE, echo=FALSE}
 library(ggalluvial)
 # filter multiple match
-card_correspond_count_others <- card_correspond_count %>% 
+card_correspond_count_others <- card_correspond_count %>%
   filter(n_distinct(last4ccnum)>1 | n_distinct(loyaltynum)>1)
 # plot
 ggplot(card_correspond_count_others,
@@ -604,6 +601,34 @@ ggplot(card_correspond_count_others,
         panel.background = element_blank())
 ```
 
+```{r q3f1, fig.cap="Not one-on-one matched pairs", code_folding="Q3-Fig1", fig.width=8}
+# filter multiple match
+card_correspond_count_others <- card_correspond_count %>%
+  filter(n_distinct(last4ccnum)>1 | n_distinct(loyaltynum)>1)
+
+card_correspond_count_others_plot <- card_correspond_count_others  %>%
+  gather_set_data(1:2) %>%        # <- ggforce helper function
+  arrange(x,last4ccnum,desc(loyaltynum))
+# plot
+ggplot(card_correspond_count_others_plot, 
+       aes(x = x, id = id, split = y, value = count)) +
+  geom_parallel_sets(aes(fill = last4ccnum), alpha = 0.7, 
+                     axis.width = 0.2, n=100, strength = 0.5) +
+  geom_parallel_sets_axes(axis.width = 0.25, fill = "gray95",
+                          color = "gray80", size = 0.15) +
+  geom_parallel_sets_labels(colour = 'gray35', size = 4.5, 
+                            angle = 0, fontface="bold") +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text.y = element_blank(),
+    axis.text.x = element_text(size = 15, face = "bold"),
+    axis.title.x  = element_blank()
+    )
+```
+
 We can infer that the pair with a wider line is the true pair. For example, credit card 4795 (Blue line) matches both L2070 and L8566 loyalty cards, but we can make sure that L8566 is the true pair. Because the the consumption count by L8566, which is displayed as the line width, is much higher than L2070.
 
 
@@ -616,31 +641,23 @@ knitr::kable(card_correspond_count_others,
 
 These matched pairs with 1 count might contain some suspicious activities. And we can assign the rows with over 5 count to be true pairs.
 
+In the final predicted card pairs, only credit cards 1286 correspond to multiple loyalty cards (L3288, L3572), which can be found in Figure \@ref(fig:q3f1)
+
 ```{r}
 card_correspond_count_others_ture <- card_correspond_count_others %>% 
   filter(count > 5)
 # union the two true pairs table
-card_correspond_true <- bind_rows(card_correspond_count_one2one, card_correspond_count_others_ture)
-```
-
-```{r}
-ggplot(card_correspond_true,
-       aes(y = 1, axis1 = last4ccnum, axis2 = loyaltynum)) +
-  geom_alluvium(width = 1/10000) +
-  # geom_stratum(width = 1/12, fill = "transparent", color = "grey") +
-  geom_label(stat = "stratum", aes(label = after_stat(stratum))) +
-  scale_x_discrete(limits = c("last4ccnum", "loyaltynum"), expand = c(.05, .05)) +
-  scale_fill_brewer(type = "qual", palette = "Set1") + 
-  theme(legend.position = "none",
-        axis.line = element_blank(),
-        axis.ticks = element_blank(),
-        axis.text.y = element_blank(),
-        axis.title.y = element_blank(),
-        panel.background = element_blank())
+card_correspond_true <- bind_rows(card_correspond_count_one2one, 
+                                  card_correspond_count_others_ture)
 ```
 
 
-Now we will math
+
+To match credit card consumption and GPS data, we can assume that one car stop corresponds to one consumption if the consumption time falls within the car stop period at the same location. 
+
+But before that, we have to label GPS of car stops with specific locations.
+
+
 
 ```{r q3f2, layout="l-body-outset", fig.cap="", code_folding="Q3-Fig2"}
 1
@@ -652,7 +669,6 @@ Now we will math
 ### Q4: Potential informal relationships
 
 > Given the data sources provided, identify potential informal or unofficial relationships among GASTech personnel. Provide evidence for these relationships
-
 
 ```{r q4f1, layout="l-body-outset", fig.cap="", code_folding="Q4-Fig1"}
 1
