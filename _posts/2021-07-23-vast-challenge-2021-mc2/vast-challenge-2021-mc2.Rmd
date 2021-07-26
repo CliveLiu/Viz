@@ -21,6 +21,31 @@ categories:
 preview: data/MC2-tourist.jpg
 ---
 
+
+<style> /* A floating TOC, but it's not suitable for long TOC*/
+html {
+  scroll-behavior: auto; /* smooth, auto */
+}
+d-article {
+    contain: none;
+    overflow-x: hidden;
+  }
+#TOC {
+  position: relative; /* float will make the toc fixed; 'fixed' can make toc float */
+  z-index: auto; /* priority when the elements overlap each other,-1,auto,50  */
+  background: transparent;     /* or#ebebeb; or white, or transparent */
+  /* optional padding: 10px; border-radius: 5px; */
+  }
+
+/* Hide the ToC when resized to mobile or tablet:  480px, 768px, 900px */
+@media screen and (min-height: 50em) and (min-width: 80em) { /* change from 900 , min-width: 80em, min-width: 1000px*/
+#TOC {
+    position: fixed;
+  }
+}
+</style>
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE,
                       eval = TRUE,
@@ -120,7 +145,7 @@ cc$day <- mday(cc$date)
 cc$hour <- hour(cc$timestamp)
 ```
 
-##### GPS data
+##### GPS and car assignments
 
 ```{r}
 knitr::kable(gps[c(0:5),],
@@ -164,8 +189,35 @@ gps2_stop_sf <- st_as_sf(gps2_stop,
                          crs = 4326) # 4326 is wgs84 Geographic Coordinate System
 ```
 
+Besides, most vehicles are assigned one-to-one. Only truck drivers are not assigned cars but are allowed to use available truck for business
 
-Besides, we need to draw the car movement path on the map. It requires the GPS data to be coordinate formats and one path is actually one line string with multiple GPS points. 
+```{r}
+# check car assignment data
+knitr::kable(car_assignments,
+             caption = "Car assignment") %>% 
+  kableExtra::kable_paper("hover", full_width = F) %>% 
+  kableExtra::scroll_box(height = "300px")
+```
+```{r}
+gps2_stop_sf
+```
+
+```{r}
+gps2_stop_sf <- left_join(gps2_stop_sf, 
+                          car_assignments, by = c("id" = "CarID"))
+```
+
+
+
+
+
+
+
+
+
+
+
+Lastly, we also need to draw the car movement path on the map. It requires the GPS data to be coordinate formats and one path is actually one line string with multiple GPS points. 
 
 ```{r}
 # convert values from numerical to factor data type
@@ -217,7 +269,7 @@ library(clock)
 library(ggforce)
 ```
 
-### Q1: Popular locations
+### Q1: Popular Locations
 
 > Using just the credit and loyalty card data, identify the most popular locations, and when they are popular. What anomalies do you see? What corrections would you recommend to correct these anomalies? 
 
@@ -369,7 +421,7 @@ And some anomalies exist in the strange time period. At 3am, there are 5 credit 
 
 The right heatmaps also show anomalies: A very high consumption amount ($32419.63) happened at 11am of "Stewart and Sons Fabrication".
 
-### Q2: Add vehical data
+### Q2: GPS Data and Anomalies
 
 > Add the vehicle data to your analysis of the credit and loyalty card data. How does your assessment of the anomalies in question 1 change based on this new data? What discrepancies between vehicle, credit, and loyalty card data do you find?
 
@@ -400,7 +452,7 @@ Besides, "U-Pump" is a special place because there were only two consumption rec
 
 We can check the stop locations on day 13. On this day, there was one point near U-Pump where the stop time is near the consumption time in "U-Pump". The corresponding car id is 24. 
 
-Thus, we believe the owner of car 24 use the credit card 9551. Let's draw the moving path of this car to discover more. They are draw in the same plot to enhance understanding
+Thus, we think that Minke, the owner of car 24, use the credit card 9551. Let's draw the moving path of this car to discover more. All elements are draw in the same plot to enhance understanding
 
 ```{r q2f1, fig.cap="Stop locations and driving path of car 24 on day 13", code_folding="Q2-Fig1"}
 gps2_stop_day13 <- gps2_stop_sf %>% 
@@ -475,7 +527,7 @@ Coincidentally, credit card 9551 also appeared in the Anomaly 1.
 Day 19 is one day before the employee missing incident. We can check the car stop points in the recent one week to find the reason or any anomalies.
 
 ```{r q2f2, fig.cap="Stop locations from day 13 to day 19", code_folding="Q2-Fig2"}
-gps2_stop_day_week <- gps2_stop_sf %>%
+gps2_stop_days <- gps2_stop_sf %>%
   filter(between(day,13,18))
 
 gps2_stop_day19 <- gps2_stop_sf %>%
@@ -487,7 +539,7 @@ map2 <- tm_shape(bgmap) +
          saturation = 1,
          interpolate = TRUE,
          max.value = 255) +
-  tm_shape(gps2_stop_day_week) +
+  tm_shape(gps2_stop_days) +
   tm_dots(size = 0.1, alpha = 0.5) +
   tm_shape(gps2_stop_day19) +
   tm_dots(col = "red", size = 0.1, alpha = 0.5)
@@ -501,16 +553,12 @@ But there are three black dot which are very close to the "Kronos Mart". Further
 The owners of the three cars are listed.
 
 ```{r}
-stop_day18 <- gps2_stop_day_week %>% 
+gps2_stop_days %>% 
                filter((id == 1 | id == 10 |id == 23) 
                       & day == 18
                       & start > "2014-01-18 13:00:00"
-                      & end < "2014-01-18 16:00:00")
-# convert data type from factor into num, to match the car_assignment
-stop_day18$id <- as.numeric(stop_day18$id)
-
-knitr::kable(left_join(stop_day18, car_assignments, by = c("id" = "CarID")),
-             caption = "The three car stop near Kronos Mart") %>% 
+                      & end < "2014-01-18 16:00:00") %>% 
+knitr::kable(caption = "The three car stop near Kronos Mart") %>% 
   kableExtra::kable_paper("hover", full_width=T)
 ```
 
@@ -547,6 +595,8 @@ We can find that there are 44 employees, but 55 credit cards and 54 loyalty card
 If one consumption time fall with one car stop period, we believe it's possible one correspondence. There might be several different purchase in one car stop period, but we can infer that the most common pair within one group is the most likely true pair.
 
 The credit card data contain specific time, but loyalty card data doesn't. Thus, We will find the relationship between credit cards and loyalty cards. After that, we will match the credit card and car stop. The owners of loyalty card can be inferred from the relationship between credit card and car stop and the relationship between credit cards and loyalty cards.
+
+##### Credit and loyalty cards pairs
 
 We full join the two card table by matching day, location and price. It's seldom that two different consumption will have the same values in the three features. Then, we use `group_by()` to find all pairs of two cards and count the consumption frequency of the pair.
 
@@ -624,7 +674,7 @@ ggplot(card_correspond_count_others_plot,
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
     axis.text.y = element_blank(),
-    axis.text.x = element_text(size = 15, face = "bold"),
+    axis.text.x = element_text(size = 12, face = "bold"),
     axis.title.x  = element_blank()
     )
 ```
@@ -651,22 +701,45 @@ card_correspond_true <- bind_rows(card_correspond_count_one2one,
                                   card_correspond_count_others_ture)
 ```
 
-
+##### Match GPS and credit card data
 
 To match credit card consumption and GPS data, we can assume that one car stop corresponds to one consumption if the consumption time falls within the car stop period at the same location. 
 
 But before that, we have to label GPS of car stops with specific locations.
 
+All car stop locations are plotted on the map. And we can see there are many locations where the car stopped for over 6 hours (red dot on the map). Most of them are near the five parks (along the coast). 
 
+We are interested in car stops where credit card consumption happened, so we should exclude these stops which are very likely at home.
 
-```{r q3f2, layout="l-body-outset", fig.cap="", code_folding="Q3-Fig2"}
-1
+Besides, we notice that there are some long car stop near other locations. Those blue dots near "Ouzeri Elian" all belong to car 28, Isande. And he/she drives car very regular: stops at about 8:00 and leave at about 17:00.
+
+It's the same for car 9, Gustav. The car has many long stops near "Bean There Done That" (north-west area): stopped at about 17:00 and start moving on the second day at about 8:00. It seems that he lives here
+
+```{r q3f2, fig.cap="Long and short car stop", code_folding="Q3-Fig2"}
+gps2_stop_long <- gps2_stop_sf %>%
+  filter(diff_mins >= 60*6)
+
+gps2_stop_short <- gps2_stop_sf %>%
+  filter(diff_mins < 60*6)
+
+map4 <- tm_shape(bgmap) +
+  tm_rgb(bgmap, r = 1,g = 2,b = 3,
+         alpha = NA,
+         saturation = 1,
+         interpolate = TRUE,
+         max.value = 255) +
+  tm_shape(gps2_stop_short) +
+  tm_dots(size = 0.1, alpha = 0.5) +
+  tm_shape(gps2_stop_long) +
+  tm_dots(col = "blue", size = 0.1, alpha = 0.5)
+tmap_leaflet(map4)
 ```
+
 ```{r q3f3, layout="l-body-outset", fig.cap="", code_folding="Q3-Fig3"}
 1
 ```
 
-### Q4: Potential informal relationships
+### Q4: Potential Relationships
 
 > Given the data sources provided, identify potential informal or unofficial relationships among GASTech personnel. Provide evidence for these relationships
 
@@ -681,7 +754,7 @@ But before that, we have to label GPS of car stops with specific locations.
 ```
 
 
-### Q5: Identify suspicious activity
+### Q5: Suspicious Activities
 
 > Do you see evidence of suspicious activity? Identify 1- 10 locations where you believe the suspicious activity is occurring, and why.
 
@@ -702,7 +775,7 @@ trucks which were used for non-business issue
 day*hour
 Now, let's divide the units from days into hours:
 
-```{r, layout="l-page", fig.height=10}
+```{r, layout="l-screen", fig.height=10}
 cc_freq_day_hour <- as.data.frame(xtabs(~location++day+hour, data = cc))
 cc_freq_day_hour$hour <- as.numeric(levels(cc_freq_day_hour$hour))[cc_freq_day_hour$hour]
 p3 <- ggplot(cc_freq_day_hour,aes(x=hour,y=location))+
