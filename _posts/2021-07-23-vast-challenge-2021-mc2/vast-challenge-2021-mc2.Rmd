@@ -54,7 +54,7 @@ knitr::opts_chunk$set(echo = TRUE,
 ```
 
 
-## Background
+# Background
 
 This study is based on the [Mini-Challenge 2](https://vast-challenge.github.io/2021/MC2.html) of the [VAST Challenge 2021](https://vast-challenge.github.io/2021/). In a fiction scenario, there is a natural gas company named "GASTech" operating in the island country if Kronos. The GASTech didn't do well in environment stewardship. And after an company IPO celebration in January 2014, several employees of GASTech went missing. An environment organization is suspected in the disappearance.
 
@@ -92,7 +92,7 @@ However, almost all graphs were static and readers would find it difficult to ex
 
 
 
-## Data Preparation
+# Data Preparation
 
 ### Data Wrangling
 
@@ -268,7 +268,7 @@ To identify popularity, we can calculate the card usage frequency and amount in 
 
 Firstly, let's plot the frequency of cards in the 14 days. We need to calculate the card usage frequency in different days, convert into data frame, draw their heatmaps and plot together.
 
-```{r q1f1, layout="l-body-outset", fig.cap = "Daily Frequency of Credit (left) and Loyalty (right) Card Usage", code_folding="Q1-Fig1"}
+```{r q1f1, layout="l-body-outset", fig.cap = "Daily Frequency of Credit (left) and Loyalty (right) Card Usage", code_folding="Q1-Fig1 Code"}
 # calculate the frequency data frame of credit and loyalty card usage
 cc_freq_day <- as.data.frame(xtabs(~location+day, data = cc))
 loyalty_freq_day <- as.data.frame(xtabs(~location+day, data = loyalty))
@@ -316,12 +316,6 @@ To correct these anomalies, we can check the GPS data to make sure who made the 
 Secondly, we can plot the consumption amount instead of frequency. The steps are almost the same.
 
 ```{r, eval=FALSE, echo=FALSE}
-################################################@
-"You can change the Fig2 to boxplot. It's better to see the outliers"
-```
-
-
-```{r q1f2, layout="l-body-outset", fig.cap="Daily Consumption Amount of Credit and Loyalty Card", code_folding="Q1-Fig2"}
 cc_price_matrix <- tapply(cc$price,cc[,c("location","day")],sum)
 cc_price <- reshape2::melt(cc_price_matrix)
 
@@ -351,13 +345,34 @@ plotly::subplot(ggplotly(p1_price),
         shareY = TRUE)
 ```
 
+```{r q1f2, fig.cap="Daily Consumption Amount of Credit Card", code_folding="Q1-Fig2 Code"}
+cc_price_matrix <- tapply(cc$price,cc[,c("location","day")],sum)
+cc_price <- reshape2::melt(cc_price_matrix)
+cc_price <- na.omit(cc_price)
+p1_price <- ggplot(cc_price,aes(x=day,y=location))+
+  geom_tile(aes(fill=value))+
+  scale_fill_gradient(low = "#deeff7", high = "#0D2330")+
+  theme(panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        legend.title=element_blank())
+
+ggplotly(p1_price)
+```
+
+```{r q1f3, fig.height=6, fig.cap="Daily Consumption Amount of Credit Card (box plot)", code_folding="Q1-Fig3 Code"}
+plot_ly(cc_price, x = ~value, y = ~location, type = "box",
+        boxpoints = "outliers", marker = list(color= 'rgb(255,0,0)')) %>% 
+  layout(showlegend = FALSE)
+```
+
 The consumption amount differences among locations are much bigger than frequency differences. 
 
 Apparently, "Abila Airport" are the place where has the biggest consumption amount. And these consumption occurred on weekdays only.
 
-Besides, "Stewart and Sons Fabrication", "Nationwide Refinery" and "Abila Airport" also have high consumption amounts on weekdays. All these locations don't show high frequency values in previous graphs but have very high daily consumption amounts.
+Besides, "Stewart and Sons Fabrication", "Nationwide Refinery" and "Abila Airport" also have high consumption amounts. All these locations don't show high frequency values in previous graphs but have very high daily consumption amounts.
 
-And there are many outliers which might be anomalies. For example, "Frydos Autosupply n' More" had a daily cc consumption amount ($10455.22) in day 13, which is several times as much as those in other days. And the loyalty consumption amount in day 8 at "Nationwide Refinery" is 12554.91.
+And there are many outliers which might be anomalies. For example, "Frydos Autosupply n' More" had a daily cc consumption amount ($10455.22) on day 13, which is several times as much as those in other days. And the "Albert's Fine Clothing" also has a daily consumption outlier on day 17.
 
 What's more, there are many inconsistencies between amounts in the credit card record and loyalty card record. At "Stewart and Sons Fabrication", the daily amounts from day 13 to day 16 don't match in two graphs.
 
@@ -366,12 +381,8 @@ To correct these anomalies, we need to check through the car movement data where
 
 Lastly, we change the time unit from days to hours to analyze the popular locations. Only the timestamp of credit card data contains time, so there are no hourly heatmaps for loyalty card usage.
 
-```{r, eval=FALSE, echo=FALSE}
 
-```
-
-
-```{r q1f3, layout="l-body-outset", fig.cap="Hourly Consumption Frequency and Amount of Credit Card", code_folding="Q1-Fig3"}
+```{r q1f4, layout="l-body-outset", fig.cap="Hourly Consumption Frequency and Amount of Credit Card", code_folding="Q1-Fig4"}
 cc_freq_hour <- as.data.frame(xtabs(~location+hour, data = cc))
 # convert factor into number
 cc_freq_hour$hour <- as.numeric(levels(cc_freq_hour$hour))[cc_freq_hour$hour]
@@ -404,13 +415,13 @@ plotly::subplot(ggplotly(p3_freq),
 
 From the left hourly heatmap, we can easily identify the popular period for each locations since there are clear pattern. 
 
-* Breakfast time (7am to 8am): "Brew've Been Served", "Hallowed Grounds"
-* Lunch time (12pm to 1pm): "Katerina’s Café", "Hippokampos", "Abila Zacharo"
-* Dinner time (7pm to 8pm): "Katerina’s Café", "Hippokampos", "Guy's Gyros"
+* Breakfast time (07:00 to 08:59): "Brew've Been Served", "Hallowed Grounds"
+* Lunch time (12:00 to 1:59): "Katerina’s Café", "Hippokampos", "Abila Zacharo"
+* Dinner time (19:00 to 20:59): "Katerina’s Café", "Hippokampos", "Guy's Gyros"
 
 And some anomalies exist in the strange time period. At 3am, there are 5 credit card usages in "Kronos Mart". For "Daily Dealz", the only credit card transaction happened at 6am.
 
-The right heatmaps also show anomalies: A very high consumption amount ($32419.63) happened at 11am of "Stewart and Sons Fabrication".
+The right heatmaps also show anomalies: A very high consumption amount ($32419.63) happened at 11 o'clock of "Stewart and Sons Fabrication".
 
 ### Q2: GPS Data and Anomalies
 
@@ -437,15 +448,15 @@ knitr::kable(cc %>%
   kableExtra::kable_paper("hover", full_width = F)
 ```
 
-We can see the cc owner make the only only transaction at "Daily Dealz" at early morning (6am), which is the only one transaction in the two weeks.
+We can see the cc owner make the only only transaction at "Daily Dealz" at early morning (6 o'clock), which is the only one transaction in the two weeks.
 
-Besides, "U-Pump" is a special place because there were only two consumption records in the two weeks, which can be found in Figure \@ref(fig:q1f3) and Figure \@ref(fig:q1f1). Therefore, there should have fewer stop locations near U-Pump in the car GPS data.
+Besides, "U-Pump" is a special place because there were only two consumption records in the two weeks, which can be found in Figure \@ref(fig:q1f4) and Figure \@ref(fig:q1f1). Therefore, there should have fewer stop locations near U-Pump in the car GPS data.
 
 We can check the stop locations on day 13. On this day, there was one point near U-Pump where the stop time is near the consumption time in "U-Pump". The corresponding car id is 24. 
 
 Thus, we think that Minke, the owner of car 24, use the credit card 9551. Let's draw the moving path of this car to discover more. All elements are draw in the same plot to enhance understanding
 
-```{r q2f1, fig.cap="Stop locations and driving path of car 24 on day 13", code_folding="Q2-Fig1"}
+```{r q2f1, fig.cap="Stop locations and driving path of car 24 on day 13", code_folding="Q2-Fig1 Code"}
 gps2_stop_day13 <- gps2_stop_sf %>% 
   filter(day ==13)
 
@@ -470,7 +481,7 @@ map1 <- tm_shape(bgmap) +
 tmap_leaflet(map1)
 ```
 
-Hovering over blue dots, we can see the stop locations of car 24. On day 13, the car started running at about 7pm from home (the east area in the map) and stopped at "Katerina’s Café" (the south-east area) for half an hour. Then, the car stopped near "Albert's Fine Clothing" at around noon (the north-west area).
+Hovering over blue dots, we can see the stop locations of car 24. On day 13, the car started running at about 7 o'clock from home (the east area in the map) and stopped at "Katerina’s Café" (the south-east area) for half an hour. Then, the car stopped near "Albert's Fine Clothing" at around noon (the north-west area).
 
 After that, the car stopped near "U-Pump" (the center area) from 12:35 to 13:22. The purchase time in "U-Pump", 13:18:00, matches the time period.
 
@@ -498,7 +509,7 @@ knitr::kable(cc %>%
 ```
 We can see that the two consumption records, which have little time gap with the car leaving/stopping, exactly have corresponding loyalty card usage. But the other three consumption records should be less rush but didn't use loyalty card. One possible explaination might be the card stealing. This suspicious activity need to be analyzed further in question 5.
 
-##### Anomaly 2: Mid-night consumption at "Kronos Mart", Figure \@ref(fig:q1f3)
+##### Anomaly 2: Mid-night consumption at "Kronos Mart", Figure \@ref(fig:q1f4)
 
 The first step is to find the corresponding records.
 
@@ -517,7 +528,7 @@ Coincidentally, credit card 9551 also appeared in the Anomaly 1.
 
 Day 19 is one day before the employee missing incident. We can check the car stop points in the recent one week to find the reason or any anomalies.
 
-```{r q2f2, fig.cap="Stop locations from day 13 to day 19", code_folding="Q2-Fig2"}
+```{r q2f2, fig.cap="Stop locations from day 13 to day 19", code_folding="Q2-Fig2 Code"}
 gps2_stop_days <- gps2_stop_sf %>%
   filter(between(day,13,18))
 
@@ -642,7 +653,7 @@ ggplot(card_correspond_count_others,
         panel.background = element_blank())
 ```
 
-```{r q3f1, fig.cap="Multiple matched pairs", code_folding="Q3-Fig1", fig.width=8}
+```{r q3f1, fig.cap="Multiple matched pairs", code_folding="Q3-Fig1 Code", fig.width=8}
 # filter multiple match
 card_correspond_count_others <- card_correspond_count %>%
   filter(n_distinct(last4ccnum)>1 | n_distinct(loyaltynum)>1)
@@ -702,11 +713,11 @@ All car stop locations are plotted on the map. And we can see there are many loc
 
 We are interested in car stops where credit card consumption happened, so we should exclude these stops which are very likely at home.
 
-Besides, we notice that there are some long car stop near other locations. Those blue dots near "Ouzeri Elian" all belong to car 28, Isande. And he/she drives car very regular: stops at about 8:00 and leave at about 17:00.
+Besides, we notice that there are some long car stop near other locations. Those blue dots near "Ouzeri Elian" all belong to Isande, car 28. And he/she drives car very regular: stops at about 8:00 and leave at about 17:00.
 
 It's the same for car 9, Gustav. The car has many long stops near "Bean There Done That" (north-west area): stopped at about 17:00 and start moving on the second day at about 8:00. It seems that he lives here.
 
-```{r q3f2, fig.cap="Long and short car stop", code_folding="Q3-Fig2"}
+```{r q3f2, fig.cap="Long and short car stop", code_folding="Q3-Fig2 Code"}
 gps2_stop_long <- gps2_stop_sf %>%
   filter(diff_mins >= 60*6)
 
@@ -742,7 +753,7 @@ During this process, we repeat labeling confident car stop, filtering out pairs,
 
 Some of these confidently labeled car stops locations might be wrong. But they need to match the consumption in the to be the true GPS and consumption pair. This will decrease the error rate a lot since it's much less possible that one specific car stop with a wrong location label can match one record in that location at the matched time period.
 
-```{r , eval=FALSE, echo=FALSE, code_folding="Mannual work"}
+```{r , eval=FALSE, echo=FALSE, code_folding="Codes for mannual work"}
 #  plot gps2_stop_short only 
 map5 <- tm_shape(bgmap) +
   tm_rgb(bgmap, r = 1,g = 2,b = 3,
@@ -787,7 +798,6 @@ tmap_leaflet(map5)
 
 
 ```{r q5f1, layout="l-body-outset", fig.cap="", code_folding="Q5-Fig1"}
-1
 ```
 ```{r q5f2, layout="l-body-outset", fig.cap="", code_folding="Q5-Fig2"}
 1

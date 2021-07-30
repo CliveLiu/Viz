@@ -51,7 +51,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ![](img/2.png){width=20%}
 
-word testword testword testword testword testword testword testword testword testword test
+word testword `testword` testword testword testword testword testword testword test
 
 
 ```{r, echo = TRUE, eval=FALSE}
