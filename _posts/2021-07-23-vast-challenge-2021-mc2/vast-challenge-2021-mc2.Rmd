@@ -54,7 +54,7 @@ knitr::opts_chunk$set(echo = TRUE,
 ```
 
 
-# Background
+## Background
 
 This study is based on the [Mini-Challenge 2](https://vast-challenge.github.io/2021/MC2.html) of the [VAST Challenge 2021](https://vast-challenge.github.io/2021/). In a fiction scenario, there is a natural gas company named "GASTech" operating in the island country if Kronos. The GASTech didn't do well in environment stewardship. And after an company IPO celebration in January 2014, several employees of GASTech went missing. An environment organization is suspected in the disappearance.
 
@@ -92,7 +92,7 @@ However, almost all graphs were static and readers would find it difficult to ex
 
 
 
-# Data Preparation
+## Data Preparation
 
 ### Data Wrangling
 
@@ -360,7 +360,7 @@ p1_price <- ggplot(cc_price,aes(x=day,y=location))+
 ggplotly(p1_price)
 ```
 
-```{r q1f3, fig.height=6, fig.cap="Daily Consumption Amount of Credit Card (box plot)", code_folding="Q1-Fig3 Code"}
+```{r q1f3, layout="l-body-outset", fig.height=6, fig.cap="Daily Consumption Amount of Credit Card (box plot)", code_folding="Q1-Fig3 Code"}
 plot_ly(cc_price, x = ~value, y = ~location, type = "box",
         boxpoints = "outliers", marker = list(color= 'rgb(255,0,0)')) %>% 
   layout(showlegend = FALSE)
@@ -421,7 +421,16 @@ From the left hourly heatmap, we can easily identify the popular period for each
 
 And some anomalies exist in the strange time period. At 3am, there are 5 credit card usages in "Kronos Mart". For "Daily Dealz", the only credit card transaction happened at 6am.
 
-The right heatmaps also show anomalies: A very high consumption amount ($32419.63) happened at 11 o'clock of "Stewart and Sons Fabrication".
+The right heatmap also shows anomalies: the consumption at "Bean There Done That" and "Coffee Shack" all happened at 12 o'clock.
+
+```{r}
+knitr::kable(cc %>% 
+               filter(location == "Bean There Done That" | location == "Coffee Shack" ),
+             caption = "Consumption record at Bean There Done That and Coffee Shack ") %>% 
+  kableExtra::kable_paper("hover", full_width = F) %>% 
+  kableExtra::scroll_box(height = "300px") 
+```
+We can see that all consumption records are at 12:00:00. There might be something wrong with the machine which records credit card consumption at the two location.
 
 ### Q2: GPS Data and Anomalies
 
@@ -741,29 +750,140 @@ After excluding the long on short car stop, We can find that these car stops are
 
 Many car stops locations might not correspond to any local business locations. And some car stops, which actually correspond consumption in one location, don't have close GPS location. Furthermore, some locations are very near each other.
 
-To fix this issue, we can find the most likely correspondence by their distinct car stop locations. For example, the multiple dots near the "Abila Airport"(southwest) should be a clear/distinct group. They are not single stops, close within one group and far from other dots&locations. Thus, We can believe that they correspond to the airport location with high confidence. 
+To fix this issue, we can find the most confident correspondence firstly. For example, the multiple dots near the "Abila Airport"(southwest) should be a clear/distinct group. They are not single stops, close within one group and far from other dots&locations. Thus, We can believe that they correspond to the airport location with high confidence. 
 
 It's the same for "Maximum Iron and Steel"(west), "Abila Scrapyard"(northwest),  "Frank's Fuel"(west), "Bean There Done That"(northwest), "Coffee Cameleon"(southeast), "Chostus Hotel"(northeast).
 
 Some dots might not be a distinct group and there are several dot groups near one location. But some groups still can be labeled to one location with confidence, such as some dots along the street of the "Kronos Mart"(west). "Roberts and Sons"(west), "Desafio Golf Course"(northeast), "Albert's Fine Clothing"(north), "Jack's Magical Beans"(northeast), "Hallowed Grounds"(east) also have such dots groups.
 
-After labeling these dots groups, we can match the credit card by the timestamp and location labels. And we can filter out some car owner who have matched pairs. Then, within one pair, we check the car stops of the car and consumption of the credit card to match more car stop with locations.
+After labeling these dots groups, we can match the credit card by the timestamp and location labels. It give us possible pairs of car id and credit card. For each pair, we will check whether every record has a unique corresponding a car stop record with this pair among 14 days. If all matches, this pairs will be regard as a confident pair.
 
-During this process, we repeat labeling confident car stop, filtering out pairs, checking new pairs and labeling new car stop until the new pairs is not confident or inconsistent with confident pairs.
+```{r}
+# add distinct index to select GPS records later
+gps2_stop_short$idx <- c(1:2659)
+# calculate the distance between any two dot
+distance_matrix <- st_distance(gps2_stop_short$geometry, gps2_stop_short$geometry)
+# add a new col for labeling locations
+gps2_stop_short$location <- ""
+```
 
-Some of these confidently labeled car stops locations might be wrong. But they need to match the consumption in the to be the true GPS and consumption pair. This will decrease the error rate a lot since it's much less possible that one specific car stop with a wrong location label can match one record in that location at the matched time period.
+Take the dots group near "Frank's Fuel"(west) as example:
 
-```{r , eval=FALSE, echo=FALSE, code_folding="Codes for mannual work"}
-#  plot gps2_stop_short only 
-map5 <- tm_shape(bgmap) +
+We can hover in the map above to find one of dots close to the location and get the distinct 'idx' of this car stop. 
+
+Then we need to filter out all dots which belong to this group. To do this, we find all dots whose distances with it are less than 50 meters. And plot them on the map to check whether there are dots missing or the range of 50 meters is so large that it includes other others.
+
+```{r}
+## "Frank's Fuel"(west), 
+# start with dot 2545, which is near this location
+# find all dots which have less than 50 meter in distance
+frank_idx <- which(as.integer(distance_matrix[2545,]) < 50)
+dot_group <- gps2_stop_short %>%
+  filter(idx %in% frank_idx)
+others <- gps2_stop_short %>%
+  filter(!idx %in% frank_idx)
+# check whether there are other dots near this group but with different labels (blue dots) on the map
+# if yes, we need to change the dot distance from default value(50) to a bigger value
+mapx <- tm_shape(bgmap) +
   tm_rgb(bgmap, r = 1,g = 2,b = 3,
          alpha = NA,
          saturation = 1,
          interpolate = TRUE,
          max.value = 255) +
-  tm_shape(gps2_stop_short) +
-  tm_dots(size = 0.3, alpha = 0.3)
-tmap_leaflet(map5)
+  tm_shape(dot_group) +
+  tm_dots(size = 0.1, alpha = 0.4) +
+  tm_shape(others) +
+  tm_dots(col = "blue", size = 0.2, alpha = 0.5)
+tmap_leaflet(mapx)
+```
+
+After filtering this dot group, we will label them with location "Frank's Fuel" and match with consumption records in credit cards by location and timestamp(the consumption time need to be within the start time and the end time of the car stop). It will give us possible pairs of one car and one credit card.
+
+```{r}
+# label them with this location
+gps2_stop_short$location[gps2_stop_short$idx %in% frank_idx] <- "Frank's Fuel"
+# match records in cc
+gps2_stop_short %>% 
+  filter(idx %in% frank_idx) %>% 
+  left_join(cc, by = c('location')) %>% 
+  filter(timestamp > start & timestamp < end) %>% 
+  select(id, start, end, timestamp, last4ccnum)
+```
+
+```{r}
+gps2_stop_short %>% 
+  filter(idx %in% frank_idx) %>% 
+  left_join(cc, by = c('location')) %>% 
+  filter(timestamp > start & timestamp < end)%>% 
+  select(id, start, end, timestamp, last4ccnum)
+```
+
+
+<!-- Some of these pairs might be wrong. But we will match all consumption with car stops by timestamp with one pair. If all consumption records has a unique corresponding car stop, we can regard this as a confident pair. -->
+
+we find 2 possible pairs. Let's check them separately.
+
+For car id 15 and cc 3853:
+
+```{r}
+# match all records of car id 15, cc 3853
+match_cc <- subset(cc,last4ccnum == 3853) %>% 
+  left_join(subset(gps2_stop_short, id == 15, select = c(start,end,idx, day)),
+            by = c('day')) %>% 
+  filter(timestamp > start & timestamp < end)
+```
+
+Check whether there are cc records which match multiple pairs. 
+
+```{r}
+match_cc %>% 
+  group_by(idx) %>% 
+  summarize(count = n()) %>% 
+  filter(count >1)
+```
+
+Check whether there are any cc records which are not matched.  
+
+```{r}
+subset(cc,last4ccnum == 3853) %>%
+  setdiff(match_cc[1:7])
+```
+
+```{r}
+# All match, so label them in GPS with respective locations
+gps2_stop_short$location[gps2_stop_short$idx %in% match_cc$idx] <- match_cc$location
+```
+
+All records match, we think the credit card 3853 belongs to the owner of the car 15.
+
+For car id 3, cc 9635, the steps are the same.
+
+```{r}
+# match all records of car id 3, cc 9635
+match_cc <- subset(cc,last4ccnum == 9635) %>% 
+  left_join(subset(gps2_stop_short, id == 3, select = c(start,end,idx, day)),
+            by = c('day')) %>% 
+  filter(timestamp > start & timestamp < end)
+# check whether there are cc records which match multiple car stops
+match_cc %>% 
+  group_by(idx) %>% 
+  summarize(count = n()) %>% 
+  filter(count >1)
+# check whether there are any cc records which are not matched
+subset(cc,last4ccnum == 9635) %>% 
+  setdiff(match_cc[1:7])
+# 2 out of 26 not match, but their locations are "Bean There Done That", it's still confident pair
+# label them in GPS with respective locations
+gps2_stop_short$location[gps2_stop_short$idx %in% match_cc$idx] <- match_cc$location
+```
+
+The credit card 9635 belongs to the owner of the car 3.
+
+Other dot groups will go through the same process to find pairs of cars and credits.
+
+```{r , eval=FALSE, echo=FALSE, code_folding="Mannual work for other groups"}
+#  plot gps2_stop_short only 
+
 ```
 
 ```{r, code_folding="Mannual work"}
@@ -798,6 +918,7 @@ tmap_leaflet(map5)
 
 
 ```{r q5f1, layout="l-body-outset", fig.cap="", code_folding="Q5-Fig1"}
+1
 ```
 ```{r q5f2, layout="l-body-outset", fig.cap="", code_folding="Q5-Fig2"}
 1
@@ -813,19 +934,19 @@ day*hour
 Now, let's divide the units from days into hours:
 
 ```{r, layout="l-screen", fig.height=10}
-cc_freq_day_hour <- as.data.frame(xtabs(~location++day+hour, data = cc))
-cc_freq_day_hour$hour <- as.numeric(levels(cc_freq_day_hour$hour))[cc_freq_day_hour$hour]
-p3 <- ggplot(cc_freq_day_hour,aes(x=hour,y=location))+
-  geom_tile(aes(fill=Freq),color="white")+
-  scale_fill_gradient(low = "#EFF7FB", high = "#0D2330")+
-  theme(panel.background = element_blank(),
-        axis.ticks = element_blank(),
-        axis.title = element_blank(),
-        legend.title=element_blank(),
-        plot.title = element_text(hjust=0.5))+
-  facet_wrap(~ day, ncol = 7)+
-  labs(title = "CC Frequency by hour of the day") 
-ggplotly(p3)
+# cc_freq_day_hour <- as.data.frame(xtabs(~location++day+hour, data = cc))
+# cc_freq_day_hour$hour <- as.numeric(levels(cc_freq_day_hour$hour))[cc_freq_day_hour$hour]
+# p3 <- ggplot(cc_freq_day_hour,aes(x=hour,y=location))+
+#   geom_tile(aes(fill=Freq),color="white")+
+#   scale_fill_gradient(low = "#EFF7FB", high = "#0D2330")+
+#   theme(panel.background = element_blank(),
+#         axis.ticks = element_blank(),
+#         axis.title = element_blank(),
+#         legend.title=element_blank(),
+#         plot.title = element_text(hjust=0.5))+
+#   facet_wrap(~ day, ncol = 7)+
+#   labs(title = "CC Frequency by hour of the day") 
+# ggplotly(p3)
 ```
 
 ## Conclusion
@@ -834,5 +955,5 @@ ggplotly(p3)
 # knitr::kable(card_correspong_count,
 #              caption = ) %>%
 #   kableExtra::kable_paper("hover", full_width = F)
-
+1
 ```
