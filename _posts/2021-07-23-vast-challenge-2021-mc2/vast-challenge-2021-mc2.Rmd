@@ -602,5 +602,10 @@ We can find that there are 44 employees, but 55 credit cards and 54 loyalty card
 
 Interactive graphs consume a lot of time to load in the page, so this study is divided into two blogs.
 
+
 **To be continued with [Part 2](https://ygliu.netlify.app/posts/2021-07-31-vast-challenge-2021-mc2-part2/).**
+
+--------------------------------------------------
+
+
 
