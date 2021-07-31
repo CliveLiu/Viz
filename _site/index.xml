@@ -12,7 +12,19 @@
       <link>https://ygliu.netlify.app/</link>
     </image>
     <generator>Distill</generator>
-    <lastBuildDate>Fri, 23 Jul 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 31 Jul 2021 00:00:00 +0000</lastBuildDate>
+    <item>
+      <title>VAST Challenge 2021 MC2 (II)</title>
+      <dc:creator>LIU Yangguang</dc:creator>
+      <link>https://ygliu.netlify.app/posts/2021-07-31-vast-challenge-2021-mc2-part2</link>
+      <description>To visualize &amp; analyze card ownership, potential relationships and suspicious activities with the employee disappearance incident</description>
+      <category>R</category>
+      <category>Visualization</category>
+      <category>Interactive Charts</category>
+      <guid>https://ygliu.netlify.app/posts/2021-07-31-vast-challenge-2021-mc2-part2</guid>
+      <pubDate>Sat, 31 Jul 2021 00:00:00 +0000</pubDate>
+      <media:content url="https://ygliu.netlify.app/posts/2021-07-31-vast-challenge-2021-mc2-part2/data/MC2-tourist.jpg" medium="image" type="image/jpeg"/>
+    </item>
     <item>
       <title>VAST Challenge 2021 MC2</title>
       <dc:creator>LIU Yangguang</dc:creator>

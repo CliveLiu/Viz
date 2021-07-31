@@ -1,0 +1,58 @@
+---
+title: "VAST Challenge 2021 MC2 (II)"
+description: |
+  To visualize & analyze card ownership, potential relationships and suspicious activities with the employee disappearance incident
+author:
+  - name: LIU Yangguang
+    url: https://www.linkedin.com/in/ygliu/
+    affiliation: School of Computing and Information Systems, Singapore Management
+date: 07-31-2021
+output:
+  distill::distill_article:
+    self_contained: false
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    #code_folding: true
+categories:
+  - R
+  - Visualization
+  - Interactive Charts
+preview: data/MC2-tourist.jpg
+---
+
+<style> /* A floating TOC, but it's not suitable for long TOC*/
+html {
+  scroll-behavior: auto; /* smooth, auto */
+}
+d-article {
+    contain: none;
+    overflow-x: hidden;
+  }
+#TOC {
+  position: relative; /* float will make the toc fixed; 'fixed' can make toc float */
+  z-index: auto; /* priority when the elements overlap each other,-1,auto,50  */
+  background: transparent;     /* or#ebebeb; or white, or transparent */
+  /* optional padding: 10px; border-radius: 5px; */
+  }
+
+/* Hide the ToC when resized to mobile or tablet:  480px, 768px, 900px */
+@media screen and (min-height: 50em) and (min-width: 80em) { /* change from 900 , min-width: 80em, min-width: 1000px*/
+#TOC {
+    position: fixed;
+  }
+}
+</style>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      eval = TRUE,
+                      message = FALSE,
+                      warning = FALSE)
+```
+
+
+
+
+

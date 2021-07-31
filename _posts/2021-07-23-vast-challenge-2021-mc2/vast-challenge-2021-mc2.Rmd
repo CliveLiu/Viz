@@ -1,5 +1,5 @@
 ---
-title: "VAST Challenge 2021 MC2"
+title: "VAST Challenge 2021 MC2 (I)"
 description: |
   To visualize & analyze card usage and car movement data with the employee disappearance incident
 author:
