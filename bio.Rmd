@@ -27,9 +27,9 @@ Master of IT in Business | January 2021 - (Expected) April 2022
 
 B.S. in Finance and Computer Science | September 2016 - June 2020
 
-<!-- ## Experience -->
+## Experience
 
-<!-- **Google Brain** | Principal Investigator | January 2018 - Present -->
+**Shopee** | Regional Ops Intern, Fraud Analyst | August 2021 - Present
 
 
 <!-- Comment: Ctrl + Shift +C -->
