@@ -18,7 +18,7 @@ categories:
   - R
   - Visualization
   - Interactive Charts
-preview: data/MC2-tourist.jpg
+preview: data/q3f1.png
 ---
 
 <style> /* A floating TOC, but it's not suitable for long TOC*/
