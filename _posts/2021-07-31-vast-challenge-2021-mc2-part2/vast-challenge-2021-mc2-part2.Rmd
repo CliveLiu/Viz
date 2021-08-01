@@ -426,19 +426,13 @@ The credit card 9635 belongs to the owner of the car 3.
 
 Other dot groups will go through the same process to find pairs of cars and credits.
 
-```{r , eval=FALSE, echo=FALSE, code_folding="Mannual work for other groups"}
-#  plot gps2_stop_short only 
+```{r , eval=FALSE, code_folding="Mannual work for other groups"}
+
 
 ```
 
-```{r, code_folding="Mannual work"}
-### confident pair
+```{r, echo=FALSE, code_folding="Run code to get the predicted labels"}
 
-### cars&consumption with pairs
-
-### match new pairs
-
-### 
 ```
 
 

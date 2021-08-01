@@ -487,16 +487,18 @@ From the left hourly heatmap, we can easily identify the popular period for each
 
 And some anomalies exist in the strange time period. At 3am, there are 5 credit card usages in "Kronos Mart". For "Daily Dealz", the only credit card transaction happened at 6am.
 
-The right heatmap also shows anomalies: the consumption at "Bean There Done That" and "Coffee Shack" all happened at 12 o'clock.
+The right heatmap also shows anomalies: the consumption at "Bean There Done That", "Brewed Awakenings", "Jack's Magical Beans" and "Coffee Shack" all happened within 12 o'clock.
 
 ```{r}
 knitr::kable(cc %>% 
-               filter(location == "Bean There Done That" | location == "Coffee Shack" ),
+               filter(location %in% c("Bean There Done That","Coffee Shack",
+                                      "Jack's Magical Beans","Brewed Awakenings")),
              caption = "Consumption Recorda at Bean There Done That and Coffee Shack ") %>% 
   kableExtra::kable_paper("hover", full_width = F) %>% 
   kableExtra::scroll_box(height = "300px") 
 ```
-We can see that all consumption records are at 12:00:00. There might be something wrong with the machine which records credit card consumption at the two location.
+
+We can see that all consumption records at these locations are exactly at 12:00:00. And these locations seems to be coffee shop. There might be something wrong with the machine which records credit card consumption at the two location.
 
 ### Q2: GPS Data and Anomalies
 
