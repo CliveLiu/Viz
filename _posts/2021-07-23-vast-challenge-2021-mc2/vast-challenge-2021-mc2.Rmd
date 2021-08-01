@@ -5,7 +5,7 @@ description: |
 author:
   - name: LIU Yangguang
     url: https://www.linkedin.com/in/ygliu/
-    affiliation: School of Computing and Information Systems, Singapore Management
+    affiliation: School of Computing and Information Systems, Singapore Management University
 date: 07-23-2021
 output:
   distill::distill_article:
@@ -58,11 +58,11 @@ knitr::opts_chunk$set(echo = TRUE,
 
 This study is based on the [Mini-Challenge 2](https://vast-challenge.github.io/2021/MC2.html) of the [VAST Challenge 2021](https://vast-challenge.github.io/2021/). In a fiction scenario, there is a natural gas company named "GASTech" operating in the island country if Kronos. The GASTech didn't do well in environment stewardship. And after an company IPO celebration in January 2014, several employees of GASTech went missing. An environment organization is suspected in the disappearance.
 
-Many of the Abila, Kronos-based employees of GAStech have company cars which are approved for both personal and business use. Those who do not have company cars have the ability to check out company trucks for business use, but these trucks cannot be used for personal business.
+Many of the Abila, Kronos-based employees of GASTech have company cars which are approved for both personal and business use. Those who do not have company cars have the ability to check out company trucks for business use, but these trucks cannot be used for personal business.
 
-Employees with company cars are happy to have these vehicles, because the company cars are generally much higher quality than the cars they would be able to afford otherwise. However, GAStech does not trust their employees. Without the employees? knowledge, GAStech has installed geospatial tracking software in the company vehicles. The vehicles are tracked periodically as long as they are moving.
+Employees with company cars are happy to have these vehicles, because the company cars are generally much higher quality than the cars they would be able to afford otherwise. However, GASTech does not trust their employees. Without the employees? knowledge, GASTech has installed geospatial tracking software in the company vehicles. The vehicles are tracked periodically as long as they are moving.
 
-This vehicle tracking data has been made available to law enforcement to support their investigation. Unfortunately, data is not available for the day the GAStech employees went missing. Data is only available for the two weeks prior to the disappearance.
+This vehicle tracking data has been made available to law enforcement to support their investigation. Unfortunately, data is not available for the day the GASTech employees went missing. Data is only available for the two weeks prior to the disappearance.
 
 To promote local businesses, Kronos based companies provide a Kronos Kares benefit card to GASTech employees giving them discounts and rewards in exchange for collecting information about their credit card purchases and preferences as recorded on loyalty cards. This data has been made available to investigators in the hopes that it can help resolve the situation. However, Kronos Kares does not collect personal information beyond purchases.
 
@@ -86,9 +86,9 @@ Use visual analytics to identify which GASTech employees made which purchases an
 
 The VAST Challenge 2014 has the same scenario with slightly different dataset and questions. The submission repository can be found [here](http://visualdata.wustl.edu/varepository/VAST%20Challenge%202014/challenges/MC2%20-%20Patterns%20of%20Life%20Analysis/).
 
-Various analytic tools were used among the submissions, like JMP, D3 and custom tools. The heatmap and time histograms were useful to represent the numerical value under the combination of one  categorical variable and one discrete/categorical variable, such as the usage frequency under different locations and days. Besides, movement line graph with the map background  can help to identify and check suspicious activities.
+Various analytic tools were used among the submissions, like SAS EM, D3 and custom tools. From the graph view, the heatmap and time histograms were useful to represent the numerical value under the combination of two discrete/categorical variables, such as the hourly temperature of different regions in one day. Besides, car movement line/dot graph on the map can help to track suspicious activities. And the relationships among individuals are shown represented well in network graphs.
 
-However, almost all graphs were static and readers would find it difficult to explore other parts in graphs which were not specially mentioned by authors. Since the study is displayed on html page, the interactive graphs will be possible. For example, the tooltip function can make every data point to have detailed information without checking the axis or drawing additional graphs. The zoom-in and onclick functions allow readers to check the whole complex graph with too many lines/objects and focus on one part only.  
+However, almost all graphs were static and readers would find it difficult to explore other parts in graphs which were not specially mentioned by authors. Since the study is displayed on html pages, interactive graphs will be possible and add more details & convenience. For example, the tooltip function can make every data point to have detailed information without checking the axis or drawing additional graphs. The zoom-in and on-click functions allow readers to check or focus on one part in a complex graph with many lines/objects.  
 
 
 
@@ -104,16 +104,18 @@ library(lubridate)
 library(raster)
 library(sf)
 library(tidyr)
+library(dplyr)
 ```
 
 
 ##### Card Usage data
 
-The location names contain some special characters, such as "Café", which are not recognized by utf-8 encoding. Thus, special encoding is used in reading data.
+We have the consumption records of credit cards and loyalty cards.
 
 ```{r}
 loyalty <- read_csv("data/loyalty_data.csv", locale=locale(encoding ="windows-1252"))
 cc <- read_csv("data/cc_data.csv", locale=locale(encoding ="windows-1252"))
+# The location names contain some special characters, such as "Café", which are not recognized by utf-8 encoding. Thus, special encoding is used in reading data.
 ```
 
 
@@ -127,18 +129,18 @@ knitr::kable(cc[c(0:5),],
 
 ```{r}
 knitr::kable(loyalty[c(0:5),],
-             caption = "Loyalty Card  Usage Data") %>% 
+             caption = "Loyalty Card Usage Data") %>% 
   kableExtra::kable_paper("hover", full_width = F)
 ```
 
 The timestamp in the credit card usage date ("cc") contains date and time, while the timestamp in the loyal card usage data ("loyalty") contains only data. Besides, their data type is string, which will be transformed into datetime type.
 
-And we separate day, hour from the datetime feature.
+After that, we will separate day, hour from the datetime feature. It will make it simple to draw graphs later.
 
 ```{r}
 loyalty$timestamp <- as.Date(loyalty$timestamp, "%m/%d/%Y")
 cc$timestamp <- strptime(cc$timestamp, "%m/%d/%Y %H:%M")
-
+# separate features
 loyalty$day <- mday(loyalty$timestamp)
 cc$date <- as.Date(cc$timestamp, "%m/%d/%Y %H:%M")
 cc$day <- mday(cc$date)
@@ -146,6 +148,8 @@ cc$hour <- hour(cc$timestamp)
 ```
 
 ##### GPS and car assignments
+
+The car movement GPS data and the car assignment data are provided.
 
 ```{r}
 gps <- read_csv("data/gps.csv")
@@ -157,7 +161,7 @@ knitr::kable(gps[c(0:5),],
 
 The timestamp in the GPS data also need to be transformed. 
 
-And the longitude and latitude are rounded into 5 digits. It can avoid the inconsistent/inaccurate GPS data to some extent. And five decimal places implies 1.11 meters accuracy, which is better than 4 or 6 digits (11.1 meter or 0.11 meter accuracy) under this question scenario.
+Besides, the longitude and latitude will be rounded into 5 digits. It can avoid the inconsistent/inaccurate in GPS data to some extent. And five decimal places implies 1.11 meters accuracy, which is better than 4 or 6 digits (11.1 meter or 0.11 meter accuracy) under this question scenario.
 
 
 ```{r}
@@ -171,19 +175,28 @@ gps$long <- round(gps$long, digits = 5)
 gps2 <- gps
 ```
 
-In the challenge page, it mentioned that the vehicles are tracked periodically as long as they are moving. Thus, the time gap in the GPS data within one car indicates that this car stopped at current GPS location. Stops correspond to local business locations or other locations. To find these business locations, we excluded out the time gap less than 3 minutes, which might be that the car stopped to wait for traffic light. 
+In following sections, we will draw car stop locations as well as car movement paths on the map. Thus, we need to get the car stop locations and car movement from the GPS data. 
+
+And in the question background of the [challenge page](https://vast-challenge.github.io/2021/MC2.html), it mentioned that the vehicles are tracked periodically as long as they are moving. 
+
+So the time gap in the time sequential GPS data within one car could indicate that this car stopped at current GPS location. To find places of interest, we will exclude out the time gap less than 3 minutes, which might be that the car stopped to wait for traffic light or just GPS tracker problem. 
 
 
 ```{r}
+gps2 <- gps
 gps2 <- gps2 %>% 
   group_by(id) %>% 
+  # use the current timestamp minus the timestamp in a preceding record
   mutate(end = Timestamp,
          start = lag(Timestamp, default = first(Timestamp),
                    order_by = Timestamp),
          diff_mins = difftime(end, start, units = "mins")) %>% 
+  # diff_mins shows the time gap between the current record and the preceding record
+  # if the diff_mins > 3 mins, we think the car has stopped over 3 mins and just start running at the current timestamp
   mutate(stop = ifelse(diff_mins >= 3, TRUE, FALSE)) %>% 
   filter(stop == TRUE) %>% 
-  ungroup()
+  ungroup() %>% 
+  arrange(id, Timestamp)
 # rearrange useful features
 gps2_stop <- gps2[c(7,6,2,3,4,8,5)]
 
@@ -192,18 +205,71 @@ gps2_stop_sf <- st_as_sf(gps2_stop,
                          crs = 4326) # 4326 is wgs84 Geographic Coordinate System
 ```
 
-The "start" in the "gps2_stop_sf" refers to the time when the car starts parking, while the "end" refers to the time when the car ends parking.
+The "start" in the "gps2_stop_sf" refers to the start time of this car stop period, while the "end" refers to the end time when the car ends parking and start moving.
 
-Besides, most vehicles are assigned one-to-one. Only truck drivers are not assigned cars but are allowed to use available truck for business
+However we will find the GPS data has multiple strange car stops. One is shown as follows.
+
+```{r}
+knitr::kable(gps2_stop_sf[c(5:8),],
+             caption = "Anomalies in Car Stop") %>% 
+  kableExtra::kable_paper("hover", full_width = F)
+```
+
+We can see the end time of the 2nd car stop is the same with the start time of the 3rd car stop. But they should be one car stop originally instead of two car stops. There are a lot of such car stop records. And why this occurred is that there is a single GPS record within an original car stop. This record should not be there and will break the car stop into two after the above code logic.
+
+To fix this, we add one more flag feature to exclude every abnormal GPS records within single original car stop. These records have special timestamp: far away from one preceding timestamp and far away from one following timestamp in records of one car. But for the normal car stop, the timestamp, which is also the end time of this car stop period, refer the time when the car starts moving and should be followed by continuous timestamp. Thus, we can exclude those car stops whose following timestamp is far from itself.
+
+We choose 30 seconds as the cutoff. It means that records will be regarded as abnormal and excluded if the car stop period ends at this timestamp (the car should start moving) but there are no car movement GPS data in 30 seconds.
+
+```{r}
+gps2 <- gps
+# assign unique index
+gps2$idx <- c(1:685169)
+gps2_false_stop <- gps2 %>% 
+  group_by(id) %>% 
+  arrange(Timestamp) %>% 
+  mutate(end = Timestamp,
+         start = lag(Timestamp, default = first(Timestamp)),
+         diff_mins = difftime(end, start, units = "mins"),
+         move_time_sec = difftime(lead(Timestamp, n=2), Timestamp, units = "sec")) %>%
+  filter(diff_mins >= 3 & move_time_sec > 30) %>% 
+  ungroup() %>%
+  dplyr::select(start, end, idx, id, lat, long)
+false_stop_idx <- gps2_false_stop$idx
+# exclude these records
+gps2_true <- gps2 %>% 
+  filter(!idx %in% false_stop_idx)
+# now we can get true stop 
+gps2_true_stop <- gps2_true %>% 
+  group_by(id) %>% 
+  arrange(Timestamp) %>% 
+  mutate(end = Timestamp,
+         start = lag(Timestamp, default = first(Timestamp)),
+         diff_mins = difftime(end, start, units = "mins"),
+         move_time_sec = difftime(lead(Timestamp, n=2), Timestamp, units = "sec")) %>%
+  filter(diff_mins >= 3 & move_time_sec < 30) %>% 
+  ungroup() %>%
+  dplyr::select(start, end, diff_mins, diff_mins, id, lat, long, day, idx)
+# concatenate GPS into coords
+gps2_stop_sf <- st_as_sf(gps2_true_stop,
+                         coords = c("long", "lat"), # combine the lo, la
+                         crs = 4326) # 4326 is wgs84 Geographic Coordinate
+# add unique index 
+gps2_stop_sf$idx1 <- c(1:nrow(gps2_stop_sf))
+```
+
+For car assignment, most vehicles are assigned one-to-one. Only truck drivers are not assigned cars but are allowed to use available trucks for business purpose.
 
 ```{r}
 car_assignments <- read_csv("data/car-assignments.csv")
 # check car assignment data
 knitr::kable(car_assignments,
-             caption = "Car assignment") %>% 
+             caption = "Car Assignment") %>% 
   kableExtra::kable_paper("hover", full_width = F) %>% 
   kableExtra::scroll_box(height = "300px")
 ```
+
+Let's join the car assignment into the car stop locations, which will add more information while viewing the car line/dot graph on the map
 
 ```{r}
 gps2_stop_sf <- left_join(gps2_stop_sf, 
@@ -211,14 +277,15 @@ gps2_stop_sf <- left_join(gps2_stop_sf,
 ```
 
 
-Lastly, we also need to draw the car movement path on the map. It requires the GPS data to be coordinate formats and one path is actually one line string with multiple GPS points. 
+For the car movement path, we need to group the GPS data and concatenate them to the simple feature format for the graph. One path is actually one line string with multiple GPS points. 
 
 ```{r}
 # convert values from numerical to factor data type
-gps$day <- as.factor(gps$day)
-gps$id <- as_factor(gps$id)
+gps3 <- gps
+gps3$day <- as.factor(gps3$day)
+gps3$id <- as_factor(gps3$id)
 
-gps_sf <- st_as_sf(gps,
+gps_sf <- st_as_sf(gps3,
                    coords = c("long", "lat"),
                    crs = 4326)
 # group car paths
@@ -252,7 +319,6 @@ bgmap <- raster("data/Geospatial/MC2-tourist.tif")
 
 ```{r}
 library(ggplot2)
-library(dplyr)
 library(plotly)
 library(sf)
 library(tmap)
@@ -426,7 +492,7 @@ The right heatmap also shows anomalies: the consumption at "Bean There Done That
 ```{r}
 knitr::kable(cc %>% 
                filter(location == "Bean There Done That" | location == "Coffee Shack" ),
-             caption = "Consumption record at Bean There Done That and Coffee Shack ") %>% 
+             caption = "Consumption Recorda at Bean There Done That and Coffee Shack ") %>% 
   kableExtra::kable_paper("hover", full_width = F) %>% 
   kableExtra::scroll_box(height = "300px") 
 ```
@@ -444,7 +510,7 @@ Firstly, filter out the credit card consumption record at "Frydos Autosupply n' 
 ```{r}
 knitr::kable(cc %>% 
                filter(day == 13 & location == "Frydos Autosupply n' More"),
-             caption = "Consumption record at Frydos Autosupply n' More on day 13") %>% 
+             caption = "Consumption Records at Frydos Autosupply n' More on day 13") %>% 
   kableExtra::kable_paper("hover", full_width = F)
 ```
 
@@ -453,7 +519,7 @@ The abnormal consumption is from the cc number 9551. Let's check the consumption
 ```{r}
 knitr::kable(cc %>% 
                filter(day == 13 & last4ccnum == 9551),
-             caption = "Consumption record of cc 9551 owner on day 13") %>% 
+             caption = "Consumption Records of cc 9551 Owner on Day 13") %>% 
   kableExtra::kable_paper("hover", full_width = F)
 ```
 
@@ -465,7 +531,7 @@ We can check the stop locations on day 13. On this day, there was one point near
 
 Thus, we think that Minke, the owner of car 24, use the credit card 9551. Let's draw the moving path of this car to discover more. All elements are draw in the same plot to enhance understanding
 
-```{r q2f1, fig.cap="Stop locations and driving path of car 24 on day 13", code_folding="Q2-Fig1 Code"}
+```{r q2f1, fig.cap="Stop Locations and Driving Path of Car 24 on Day 13", code_folding="Q2-Fig1 Code"}
 gps2_stop_day13 <- gps2_stop_sf %>% 
   filter(day ==13)
 
@@ -512,7 +578,7 @@ We can check the consumption from the combination of credit and loyalty cards da
 knitr::kable(cc %>% 
                filter(day == 13 & last4ccnum == 9551) %>% 
                left_join(loyalty, by = c("location", "day", "price")),
-             caption = "Consumption record of cc 9551 with corresponding loyalty records on day 13") %>% 
+             caption = "Consumption Records of cc 9551 with Corresponding Loyalty Records on Day 13") %>% 
   kableExtra::kable_paper("hover", full_width = F)
 
 ```
@@ -531,13 +597,15 @@ knitr::kable(cc %>%
 ```
 
 
-The strange consumption records are the last 3 rows, which occurred at 3 o'clock on day 19 by the owner of credit cards 3484, 9551, 8332.
+The strange consumption records are the second row, the third row and the last 3 rows, which occurred at 3 o'clock.  
+
+The records on day 19 belong to the owners of credit cards 3484, 9551, 8332.
 
 Coincidentally, credit card 9551 also appeared in the Anomaly 1.
 
 Day 19 is one day before the employee missing incident. We can check the car stop points in the recent one week to find the reason or any anomalies.
 
-```{r q2f2, fig.cap="Stop locations from day 13 to day 19", code_folding="Q2-Fig2 Code"}
+```{r q2f2, fig.cap="Stop Locations from Day 13 to Day 19", code_folding="Q2-Fig2 Code"}
 gps2_stop_days <- gps2_stop_sf %>%
   filter(between(day,13,18))
 
@@ -569,7 +637,7 @@ gps2_stop_days %>%
                       & day == 18
                       & start > "2014-01-18 13:00:00"
                       & end < "2014-01-18 16:00:00") %>% 
-knitr::kable(caption = "The three car stop near Kronos Mart") %>% 
+knitr::kable(caption = "The Three Car Stop Near Kronos Mart") %>% 
   kableExtra::kable_paper("hover", full_width=T)
 ```
 

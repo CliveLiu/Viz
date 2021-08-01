@@ -5,7 +5,7 @@ description: |
 author:
   - name: LIU Yangguang
     url: https://www.linkedin.com/in/ygliu/
-    affiliation: School of Computing and Information Systems, Singapore Management
+    affiliation: School of Computing and Information Systems, Singapore Management University
 date: 07-31-2021
 output:
   distill::distill_article:
@@ -83,28 +83,45 @@ gps$day <- mday(gps$Timestamp)
 ### round the gps into 5 digits
 gps$lat <- round(gps$lat, digits = 5)
 gps$long <- round(gps$long, digits = 5)
+
 # use individual gps2 to find stop locations
 gps2 <- gps
-
-
-gps2 <- gps2 %>% 
+# assign unique index
+gps2$idx <- c(1:685169)
+gps2_false_stop <- gps2 %>% 
   group_by(id) %>% 
+  arrange(Timestamp) %>% 
   mutate(end = Timestamp,
-         start = lag(Timestamp, default = first(Timestamp),
-                   order_by = Timestamp),
-         diff_mins = difftime(end, start, units = "mins")) %>% 
-  mutate(stop = ifelse(diff_mins >= 3, TRUE, FALSE)) %>% 
-  filter(stop == TRUE) %>% 
-  ungroup()
-# rearrange useful features
-gps2_stop <- gps2[c(7,6,2,3,4,8,5)]
-
-gps2_stop_sf <- st_as_sf(gps2_stop,
+         start = lag(Timestamp, default = first(Timestamp)),
+         diff_mins = difftime(end, start, units = "mins"),
+         move_time_sec = difftime(lead(Timestamp, n=2), Timestamp, units = "sec")) %>%
+  filter(diff_mins >= 3 & move_time_sec > 30) %>% 
+  ungroup() %>%
+  dplyr::select(start, end, idx, id, lat, long)
+false_stop_idx <- gps2_false_stop$idx
+# exclude these records
+gps2_true <- gps2 %>% 
+  filter(!idx %in% false_stop_idx)
+# now we can get true stop 
+gps2_true_stop <- gps2_true %>% 
+  group_by(id) %>% 
+  arrange(Timestamp) %>% 
+  mutate(end = Timestamp,
+         start = lag(Timestamp, default = first(Timestamp)),
+         diff_mins = difftime(end, start, units = "mins"),
+         move_time_sec = difftime(lead(Timestamp, n=2), Timestamp, units = "sec")) %>%
+  filter(diff_mins >= 3 & move_time_sec < 30) %>% 
+  ungroup() %>%
+  dplyr::select(start, end, diff_mins, diff_mins, id, lat, long, day)
+# concatenate GPS into coord
+gps2_stop_sf <- st_as_sf(gps2_true_stop,
                          coords = c("long", "lat"), # combine the lo, la
-                         crs = 4326) # 4326 is wgs84 Geographic Coordinate System
+                         crs = 4326) # 4326 is wgs84 Geographic Coordinate
+# add distinct index to select GPS records later
+gps2_stop_sf$idx1 <- c(1:nrow(gps2_stop_sf))
+# 
 gps2_stop_sf <- left_join(gps2_stop_sf, 
                           car_assignments, by = c("id" = "CarID"))
-
 ##
 # convert values from numerical to factor data type
 gps$day <- as.factor(gps$day)
@@ -164,7 +181,7 @@ card_correspond_count_one2one <- card_correspond_count %>%
   filter((n_distinct(last4ccnum)==1 & n_distinct(loyaltynum)==1))
 
 knitr::kable(card_correspond_count_one2one,
-             caption = "One-on-one matched pairs") %>% 
+             caption = "One-on-one Matched Pairs") %>% 
   kableExtra::kable_paper("hover", full_width = F) %>% 
   kableExtra::scroll_box(height = "300px")
 ```
@@ -192,7 +209,7 @@ ggplot(card_correspond_count_others,
         panel.background = element_blank())
 ```
 
-```{r q3f1, fig.cap="Multiple matched pairs", code_folding="Q3-Fig1 Code", fig.width=8}
+```{r q3f1, fig.cap="Multiple Matched Pairs", code_folding="Q3-Fig1 Code", fig.width=8}
 # filter multiple match
 card_correspond_count_others <- card_correspond_count %>%
   filter(n_distinct(last4ccnum)>1 | n_distinct(loyaltynum)>1)
@@ -225,7 +242,7 @@ We can infer that the pair with a wider line is the true pair. For example, cred
 
 ```{r}
 knitr::kable(card_correspond_count_others,
-             caption = "Other matched pairs") %>% 
+             caption = "Other Matched Pairs") %>% 
   kableExtra::kable_paper("hover", full_width = F) %>% 
   kableExtra::scroll_box(height = "300px")
 ```
@@ -256,7 +273,7 @@ Besides, we notice that there are some long car stop near other locations. Those
 
 It's the same for car 9, Gustav. The car has many long stops near "Bean There Done That" (north-west area): stopped at about 17:00 and start moving on the second day at about 8:00. It seems that he lives here.
 
-```{r q3f2, fig.cap="Long and short car stop", code_folding="Q3-Fig2 Code"}
+```{r q3f2, fig.cap="Long and Short Car Stops", code_folding="Q3-Fig2 Code"}
 gps2_stop_long <- gps2_stop_sf %>%
   filter(diff_mins >= 60*6)
 
@@ -288,9 +305,10 @@ Some dots might not be a distinct group and there are several dot groups near on
 
 After labeling these dots groups, we can match the credit card by the timestamp and location labels. It give us possible pairs of car id and credit card. For each pair, we will check whether every record has a unique corresponding a car stop record with this pair among 14 days. If all matches, this pairs will be regard as a confident pair.
 
+
 ```{r}
-# add distinct index to select GPS records later
-gps2_stop_short$idx <- c(1:2659)
+# add index to get the distance from the distance matrix
+gps2_stop_short$idx2 <- c(1:nrow(gps2_stop_short))
 # calculate the distance between any two dot
 distance_matrix <- st_distance(gps2_stop_short$geometry, gps2_stop_short$geometry)
 # add a new col for labeling locations
@@ -305,14 +323,15 @@ Then we need to filter out all dots which belong to this group. To do this, we f
 
 ```{r}
 ## "Frank's Fuel"(west), 
-# start with dot 2545, which is near this location
+# start with dot 2250, which is near this location
 # find all dots which have less than 50 meter in distance
-frank_idx <- which(as.integer(distance_matrix[2545,]) < 50)
+frank_idx <- which(as.integer(distance_matrix[2250,]) < 50)
 dot_group <- gps2_stop_short %>%
-  filter(idx %in% frank_idx)
+  filter(idx2 %in% frank_idx)
 others <- gps2_stop_short %>%
-  filter(!idx %in% frank_idx)
-# check whether there are other dots near this group but with different labels (blue dots) on the map
+  filter(!idx2 %in% frank_idx)
+# check whether there are other dots near this group but with different 
+# labels (blue dots) on the map
 # if yes, we need to change the dot distance from default value(50) to a bigger value
 mapx <- tm_shape(bgmap) +
   tm_rgb(bgmap, r = 1,g = 2,b = 3,
@@ -327,25 +346,19 @@ mapx <- tm_shape(bgmap) +
 tmap_leaflet(mapx)
 ```
 
-After filtering this dot group, we will label them with location "Frank's Fuel" and match with consumption records in credit cards by location and timestamp(the consumption time need to be within the start time and the end time of the car stop). It will give us possible pairs of one car and one credit card.
+The two dots close to the "Frank's Fuel" are grouped into grey dots.
+
+After that, we will label them with location "Frank's Fuel" and match with consumption records in credit cards by location and timestamp(the consumption time need to be within the start time and the end time of the car stop). It will give us possible pairs of one car and one credit card.
 
 ```{r}
 # label them with this location
-gps2_stop_short$location[gps2_stop_short$idx %in% frank_idx] <- "Frank's Fuel"
+gps2_stop_short$location[gps2_stop_short$idx2 %in% frank_idx] <- "Frank's Fuel"
 # match records in cc
 gps2_stop_short %>% 
-  filter(idx %in% frank_idx) %>% 
+  filter(idx2 %in% frank_idx) %>% 
   left_join(cc, by = c('location')) %>% 
   filter(timestamp > start & timestamp < end) %>% 
-  select(id, start, end, timestamp, last4ccnum)
-```
-
-```{r}
-gps2_stop_short %>% 
-  filter(idx %in% frank_idx) %>% 
-  left_join(cc, by = c('location')) %>% 
-  filter(timestamp > start & timestamp < end)%>% 
-  select(id, start, end, timestamp, last4ccnum)
+  dplyr::select(id, start, end, timestamp, last4ccnum)
 ```
 
 
@@ -358,16 +371,18 @@ For car id 15 and cc 3853:
 ```{r}
 # match all records of car id 15, cc 3853
 match_cc <- subset(cc,last4ccnum == 3853) %>% 
-  left_join(subset(gps2_stop_short, id == 15, select = c(start,end,idx, day)),
+  left_join(subset(gps2_stop_short, id == 15, select = c(start,end, day, idx2)),
             by = c('day')) %>% 
   filter(timestamp > start & timestamp < end)
+nrow(match_cc)
+match_cc
 ```
 
-Check whether there are cc records which match multiple pairs. 
+33 credit card records match the car stop period of car 15. Check whether there are cc records which match multiple pairs. 
 
 ```{r}
 match_cc %>% 
-  group_by(idx) %>% 
+  group_by(idx2) %>% 
   summarize(count = n()) %>% 
   filter(count >1)
 ```
@@ -381,7 +396,7 @@ subset(cc,last4ccnum == 3853) %>%
 
 ```{r}
 # All match, so label them in GPS with respective locations
-gps2_stop_short$location[gps2_stop_short$idx %in% match_cc$idx] <- match_cc$location
+gps2_stop_short$location[gps2_stop_short$idx2 %in% match_cc$idx2] <- match_cc$location
 ```
 
 All records match, we think the credit card 3853 belongs to the owner of the car 15.
@@ -391,12 +406,12 @@ For car id 3, cc 9635, the steps are the same.
 ```{r}
 # match all records of car id 3, cc 9635
 match_cc <- subset(cc,last4ccnum == 9635) %>% 
-  left_join(subset(gps2_stop_short, id == 3, select = c(start,end,idx, day)),
+  left_join(subset(gps2_stop_short, id == 3, select = c(start,end,idx2, day)),
             by = c('day')) %>% 
   filter(timestamp > start & timestamp < end)
 # check whether there are cc records which match multiple car stops
 match_cc %>% 
-  group_by(idx) %>% 
+  group_by(idx2) %>% 
   summarize(count = n()) %>% 
   filter(count >1)
 # check whether there are any cc records which are not matched
@@ -404,7 +419,7 @@ subset(cc,last4ccnum == 9635) %>%
   setdiff(match_cc[1:7])
 # 2 out of 26 not match, but their locations are "Bean There Done That", it's still confident pair
 # label them in GPS with respective locations
-gps2_stop_short$location[gps2_stop_short$idx %in% match_cc$idx] <- match_cc$location
+gps2_stop_short$location[gps2_stop_short$idx2 %in% match_cc$idx2] <- match_cc$location
 ```
 
 The credit card 9635 belongs to the owner of the car 3.
@@ -447,9 +462,18 @@ Other dot groups will go through the same process to find pairs of cars and cred
 > Do you see evidence of suspicious activity? Identify 1- 10 locations where you believe the suspicious activity is occurring, and why.
 
 
+##### Suspicious activities in Chostus Hotel
+
+CEO周末在这住了两天
+
+car33和car7都会在Chostus Hotel几乎同时到达
+
 ```{r q5f1, layout="l-body-outset", fig.cap="", code_folding="Q5-Fig1"}
-1
+## "Chostus Hotel"(northeast).
+# start with dot
 ```
+
+
 ```{r q5f2, layout="l-body-outset", fig.cap="", code_folding="Q5-Fig2"}
 1
 ```
