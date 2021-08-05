@@ -263,166 +263,171 @@ card_correspond_true <- bind_rows(card_correspond_count_one2one,
 
 To match credit card consumption and GPS data, we can assume that one car stop corresponds to one consumption if the consumption time falls within the car stop period at the same location. 
 
-But before that, we have to label GPS of car stops with specific locations.
-
-All car stop locations are plotted on the map. And we can see there are many locations where the car stopped for over 6 hours (red dot on the map). Most of them are near the five parks (along the coast). 
-
-We are interested in car stops where credit card consumption happened, so we should exclude these stops which are very likely at home.
-
-Besides, we notice that there are some long car stop near other locations. Those blue dots near "Ouzeri Elian" all belong to Isande, car 28. And he/she drives car very regular: stops at about 8:00 and leave at about 17:00.
-
-It's the same for car 9, Gustav. The car has many long stops near "Bean There Done That" (north-west area): stopped at about 17:00 and start moving on the second day at about 8:00. It seems that he lives here.
-
-```{r q3f2, fig.cap="Long and Short Car Stops", code_folding="Q3-Fig2 Code"}
-gps2_stop_long <- gps2_stop_sf %>%
-  filter(diff_mins >= 60*6)
-
-gps2_stop_short <- gps2_stop_sf %>%
-  filter(diff_mins < 60*6)
-
-map4 <- tm_shape(bgmap) +
-  tm_rgb(bgmap, r = 1,g = 2,b = 3,
-         alpha = NA,
-         saturation = 1,
-         interpolate = TRUE,
-         max.value = 255) +
-  tm_shape(gps2_stop_short) +
-  tm_dots(size = 0.1, alpha = 0.5) +
-  tm_shape(gps2_stop_long) +
-  tm_dots(col = "blue", size = 0.2, alpha = 0.3)
-tmap_leaflet(map4)
-```
-
-After excluding the long on short car stop, We can find that these car stops are still messy in Figure \@ref(fig:q3f2). It's difficult to distinctly group car stops and label with locations. 
-
-Many car stops locations might not correspond to any local business locations. And some car stops, which actually correspond consumption in one location, don't have close GPS location. Furthermore, some locations are very near each other.
-
-To fix this issue, we can find the most confident correspondence firstly. For example, the multiple dots near the "Abila Airport"(southwest) should be a clear/distinct group. They are not single stops, close within one group and far from other dots&locations. Thus, We can believe that they correspond to the airport location with high confidence. 
-
-It's the same for "Maximum Iron and Steel"(west), "Abila Scrapyard"(northwest),  "Frank's Fuel"(west), "Bean There Done That"(northwest), "Coffee Cameleon"(southeast), "Chostus Hotel"(northeast).
-
-Some dots might not be a distinct group and there are several dot groups near one location. But some groups still can be labeled to one location with confidence, such as some dots along the street of the "Kronos Mart"(west). "Roberts and Sons"(west), "Desafio Golf Course"(northeast), "Albert's Fine Clothing"(north), "Jack's Magical Beans"(northeast), "Hallowed Grounds"(east) also have such dots groups.
-
-After labeling these dots groups, we can match the credit card by the timestamp and location labels. It give us possible pairs of car id and credit card. For each pair, we will check whether every record has a unique corresponding a car stop record with this pair among 14 days. If all matches, this pairs will be regard as a confident pair.
+考虑从频率出发，而不是像下面那样匹配，这样的话就不用去区分long stay short stay, 也不用算距离。举例的话，还是从“Frank's Fuel”开始
 
 
-```{r}
-# add index to get the distance from the distance matrix
-gps2_stop_short$idx2 <- c(1:nrow(gps2_stop_short))
-# calculate the distance between any two dot
-distance_matrix <- st_distance(gps2_stop_short$geometry, gps2_stop_short$geometry)
-# add a new col for labeling locations
-gps2_stop_short$location <- ""
-```
-
-Take the dots group near "Frank's Fuel"(west) as example:
-
-We can hover in the map above to find one of dots close to the location and get the distinct 'idx' of this car stop. 
-
-Then we need to filter out all dots which belong to this group. To do this, we find all dots whose distances with it are less than 50 meters. And plot them on the map to check whether there are dots missing or the range of 50 meters is so large that it includes other others.
-
-```{r}
-## "Frank's Fuel"(west), 
-# start with dot 2250, which is near this location
-# find all dots which have less than 50 meter in distance
-frank_idx <- which(as.integer(distance_matrix[2250,]) < 50)
-dot_group <- gps2_stop_short %>%
-  filter(idx2 %in% frank_idx)
-others <- gps2_stop_short %>%
-  filter(!idx2 %in% frank_idx)
-# check whether there are other dots near this group but with different 
-# labels (blue dots) on the map
-# if yes, we need to change the dot distance from default value(50) to a bigger value
-mapx <- tm_shape(bgmap) +
-  tm_rgb(bgmap, r = 1,g = 2,b = 3,
-         alpha = NA,
-         saturation = 1,
-         interpolate = TRUE,
-         max.value = 255) +
-  tm_shape(dot_group) +
-  tm_dots(size = 0.1, alpha = 0.4) +
-  tm_shape(others) +
-  tm_dots(col = "blue", size = 0.2, alpha = 0.5)
-tmap_leaflet(mapx)
-```
-
-The two dots close to the "Frank's Fuel" are grouped into grey dots.
-
-After that, we will label them with location "Frank's Fuel" and match with consumption records in credit cards by location and timestamp(the consumption time need to be within the start time and the end time of the car stop). It will give us possible pairs of one car and one credit card.
-
-```{r}
-# label them with this location
-gps2_stop_short$location[gps2_stop_short$idx2 %in% frank_idx] <- "Frank's Fuel"
-# match records in cc
-gps2_stop_short %>% 
-  filter(idx2 %in% frank_idx) %>% 
-  left_join(cc, by = c('location')) %>% 
-  filter(timestamp > start & timestamp < end) %>% 
-  dplyr::select(id, start, end, timestamp, last4ccnum)
-```
 
 
-<!-- Some of these pairs might be wrong. But we will match all consumption with car stops by timestamp with one pair. If all consumption records has a unique corresponding car stop, we can regard this as a confident pair. -->
+<!-- But before that, we have to label GPS of car stops with specific locations. -->
 
-we find 2 possible pairs. Let's check them separately.
+<!-- All car stop locations are plotted on the map. And we can see there are many locations where the car stopped for over 6 hours (red dot on the map). Most of them are near the five parks (along the coast).  -->
 
-For car id 15 and cc 3853:
+<!-- We are interested in car stops where credit card consumption happened, so we should exclude these stops which are very likely at home. -->
 
-```{r}
-# match all records of car id 15, cc 3853
-match_cc <- subset(cc,last4ccnum == 3853) %>% 
-  left_join(subset(gps2_stop_short, id == 15, select = c(start,end, day, idx2)),
-            by = c('day')) %>% 
-  filter(timestamp > start & timestamp < end)
-nrow(match_cc)
-match_cc
-```
+<!-- Besides, we notice that there are some long car stop near other locations. Those blue dots near "Ouzeri Elian" all belong to Isande, car 28. And he/she drives car very regular: stops at about 8:00 and leave at about 17:00. -->
 
-33 credit card records match the car stop period of car 15. Check whether there are cc records which match multiple pairs. 
+<!-- It's the same for car 9, Gustav. The car has many long stops near "Bean There Done That" (north-west area): stopped at about 17:00 and start moving on the second day at about 8:00. It seems that he lives here. -->
 
-```{r}
-match_cc %>% 
-  group_by(idx2) %>% 
-  summarize(count = n()) %>% 
-  filter(count >1)
-```
+<!-- ```{r q3f2, fig.cap="Long and Short Car Stops", code_folding="Q3-Fig2 Code"} -->
+<!-- gps2_stop_long <- gps2_stop_sf %>% -->
+<!--   filter(diff_mins >= 60*6) -->
 
-Check whether there are any cc records which are not matched.  
+<!-- gps2_stop_short <- gps2_stop_sf %>% -->
+<!--   filter(diff_mins < 60*6) -->
 
-```{r}
-subset(cc,last4ccnum == 3853) %>%
-  setdiff(match_cc[1:7])
-```
+<!-- map4 <- tm_shape(bgmap) + -->
+<!--   tm_rgb(bgmap, r = 1,g = 2,b = 3, -->
+<!--          alpha = NA, -->
+<!--          saturation = 1, -->
+<!--          interpolate = TRUE, -->
+<!--          max.value = 255) + -->
+<!--   tm_shape(gps2_stop_short) + -->
+<!--   tm_dots(size = 0.1, alpha = 0.5) + -->
+<!--   tm_shape(gps2_stop_long) + -->
+<!--   tm_dots(col = "blue", size = 0.2, alpha = 0.3) -->
+<!-- tmap_leaflet(map4) -->
+<!-- ``` -->
 
-```{r}
-# All match, so label them in GPS with respective locations
-gps2_stop_short$location[gps2_stop_short$idx2 %in% match_cc$idx2] <- match_cc$location
-```
+<!-- After excluding the long on short car stop, We can find that these car stops are still messy in Figure \@ref(fig:q3f2). It's difficult to distinctly group car stops and label with locations.  -->
 
-All records match, we think the credit card 3853 belongs to the owner of the car 15.
+<!-- Many car stops locations might not correspond to any local business locations. And some car stops, which actually correspond consumption in one location, don't have close GPS location. Furthermore, some locations are very near each other. -->
 
-For car id 3, cc 9635, the steps are the same.
+<!-- To fix this issue, we can find the most confident correspondence firstly. For example, the multiple dots near the "Abila Airport"(southwest) should be a clear/distinct group. They are not single stops, close within one group and far from other dots&locations. Thus, We can believe that they correspond to the airport location with high confidence.  -->
 
-```{r}
-# match all records of car id 3, cc 9635
-match_cc <- subset(cc,last4ccnum == 9635) %>% 
-  left_join(subset(gps2_stop_short, id == 3, select = c(start,end,idx2, day)),
-            by = c('day')) %>% 
-  filter(timestamp > start & timestamp < end)
-# check whether there are cc records which match multiple car stops
-match_cc %>% 
-  group_by(idx2) %>% 
-  summarize(count = n()) %>% 
-  filter(count >1)
-# check whether there are any cc records which are not matched
-subset(cc,last4ccnum == 9635) %>% 
-  setdiff(match_cc[1:7])
-# 2 out of 26 not match, but their locations are "Bean There Done That", it's still confident pair
-# label them in GPS with respective locations
-gps2_stop_short$location[gps2_stop_short$idx2 %in% match_cc$idx2] <- match_cc$location
-```
+<!-- It's the same for "Maximum Iron and Steel"(west), "Abila Scrapyard"(northwest),  "Frank's Fuel"(west), "Bean There Done That"(northwest), "Coffee Cameleon"(southeast), "Chostus Hotel"(northeast). -->
 
-The credit card 9635 belongs to the owner of the car 3.
+<!-- Some dots might not be a distinct group and there are several dot groups near one location. But some groups still can be labeled to one location with confidence, such as some dots along the street of the "Kronos Mart"(west). "Roberts and Sons"(west), "Desafio Golf Course"(northeast), "Albert's Fine Clothing"(north), "Jack's Magical Beans"(northeast), "Hallowed Grounds"(east) also have such dots groups. -->
+
+<!-- After labeling these dots groups, we can match the credit card by the timestamp and location labels. It give us possible pairs of car id and credit card. For each pair, we will check whether every record has a unique corresponding a car stop record with this pair among 14 days. If all matches, this pairs will be regard as a confident pair. -->
+
+
+<!-- ```{r} -->
+<!-- # add index to get the distance from the distance matrix -->
+<!-- gps2_stop_short$idx2 <- c(1:nrow(gps2_stop_short)) -->
+<!-- # calculate the distance between any two dot -->
+<!-- distance_matrix <- st_distance(gps2_stop_short$geometry, gps2_stop_short$geometry) -->
+<!-- # add a new col for labeling locations -->
+<!-- gps2_stop_short$location <- "" -->
+<!-- ``` -->
+
+<!-- Take the dots group near "Frank's Fuel"(west) as example: -->
+
+<!-- We can hover in the map above to find one of dots close to the location and get the distinct 'idx' of this car stop.  -->
+
+<!-- Then we need to filter out all dots which belong to this group. To do this, we find all dots whose distances with it are less than 50 meters. And plot them on the map to check whether there are dots missing or the range of 50 meters is so large that it includes other others. -->
+
+<!-- ```{r} -->
+<!-- ## "Frank's Fuel"(west),  -->
+<!-- # start with dot 2250, which is near this location -->
+<!-- # find all dots which have less than 50 meter in distance -->
+<!-- frank_idx <- which(as.integer(distance_matrix[2250,]) < 50) -->
+<!-- dot_group <- gps2_stop_short %>% -->
+<!--   filter(idx2 %in% frank_idx) -->
+<!-- others <- gps2_stop_short %>% -->
+<!--   filter(!idx2 %in% frank_idx) -->
+<!-- # check whether there are other dots near this group but with different  -->
+<!-- # labels (blue dots) on the map -->
+<!-- # if yes, we need to change the dot distance from default value(50) to a bigger value -->
+<!-- mapx <- tm_shape(bgmap) + -->
+<!--   tm_rgb(bgmap, r = 1,g = 2,b = 3, -->
+<!--          alpha = NA, -->
+<!--          saturation = 1, -->
+<!--          interpolate = TRUE, -->
+<!--          max.value = 255) + -->
+<!--   tm_shape(dot_group) + -->
+<!--   tm_dots(size = 0.1, alpha = 0.4) + -->
+<!--   tm_shape(others) + -->
+<!--   tm_dots(col = "blue", size = 0.2, alpha = 0.5) -->
+<!-- tmap_leaflet(mapx) -->
+<!-- ``` -->
+
+<!-- The two dots close to the "Frank's Fuel" are grouped into grey dots. -->
+
+<!-- After that, we will label them with location "Frank's Fuel" and match with consumption records in credit cards by location and timestamp(the consumption time need to be within the start time and the end time of the car stop). It will give us possible pairs of one car and one credit card. -->
+
+<!-- ```{r} -->
+<!-- # label them with this location -->
+<!-- gps2_stop_short$location[gps2_stop_short$idx2 %in% frank_idx] <- "Frank's Fuel" -->
+<!-- # match records in cc -->
+<!-- gps2_stop_short %>%  -->
+<!--   filter(idx2 %in% frank_idx) %>%  -->
+<!--   left_join(cc, by = c('location')) %>%  -->
+<!--   filter(timestamp > start & timestamp < end) %>%  -->
+<!--   dplyr::select(id, start, end, timestamp, last4ccnum) -->
+<!-- ``` -->
+
+
+<!-- <!-- Some of these pairs might be wrong. But we will match all consumption with car stops by timestamp with one pair. If all consumption records has a unique corresponding car stop, we can regard this as a confident pair. --> -->
+
+<!-- we find 2 possible pairs. Let's check them separately. -->
+
+<!-- For car id 15 and cc 3853: -->
+
+<!-- ```{r} -->
+<!-- # match all records of car id 15, cc 3853 -->
+<!-- match_cc <- subset(cc,last4ccnum == 3853) %>%  -->
+<!--   left_join(subset(gps2_stop_short, id == 15, select = c(start,end, day, idx2)), -->
+<!--             by = c('day')) %>%  -->
+<!--   filter(timestamp > start & timestamp < end) -->
+<!-- nrow(match_cc) -->
+<!-- match_cc -->
+<!-- ``` -->
+
+<!-- 33 credit card records match the car stop period of car 15. Check whether there are cc records which match multiple pairs.  -->
+
+<!-- ```{r} -->
+<!-- match_cc %>%  -->
+<!--   group_by(idx2) %>%  -->
+<!--   summarize(count = n()) %>%  -->
+<!--   filter(count >1) -->
+<!-- ``` -->
+
+<!-- Check whether there are any cc records which are not matched.   -->
+
+<!-- ```{r} -->
+<!-- subset(cc,last4ccnum == 3853) %>% -->
+<!--   setdiff(match_cc[1:7]) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- # All match, so label them in GPS with respective locations -->
+<!-- gps2_stop_short$location[gps2_stop_short$idx2 %in% match_cc$idx2] <- match_cc$location -->
+<!-- ``` -->
+
+<!-- All records match, we think the credit card 3853 belongs to the owner of the car 15. -->
+
+<!-- For car id 3, cc 9635, the steps are the same. -->
+
+<!-- ```{r} -->
+<!-- # match all records of car id 3, cc 9635 -->
+<!-- match_cc <- subset(cc,last4ccnum == 9635) %>%  -->
+<!--   left_join(subset(gps2_stop_short, id == 3, select = c(start,end,idx2, day)), -->
+<!--             by = c('day')) %>%  -->
+<!--   filter(timestamp > start & timestamp < end) -->
+<!-- # check whether there are cc records which match multiple car stops -->
+<!-- match_cc %>%  -->
+<!--   group_by(idx2) %>%  -->
+<!--   summarize(count = n()) %>%  -->
+<!--   filter(count >1) -->
+<!-- # check whether there are any cc records which are not matched -->
+<!-- subset(cc,last4ccnum == 9635) %>%  -->
+<!--   setdiff(match_cc[1:7]) -->
+<!-- # 2 out of 26 not match, but their locations are "Bean There Done That", it's still confident pair -->
+<!-- # label them in GPS with respective locations -->
+<!-- gps2_stop_short$location[gps2_stop_short$idx2 %in% match_cc$idx2] <- match_cc$location -->
+<!-- ``` -->
+
+<!-- The credit card 9635 belongs to the owner of the car 3. -->
 
 Other dot groups will go through the same process to find pairs of cars and credits.
 

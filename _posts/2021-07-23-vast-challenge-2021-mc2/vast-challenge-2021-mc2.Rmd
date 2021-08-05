@@ -529,9 +529,9 @@ We can see the cc owner make the only only transaction at "Daily Dealz" at early
 
 Besides, "U-Pump" is a special place because there were only two consumption records in the two weeks, which can be found in Figure \@ref(fig:q1f4) and Figure \@ref(fig:q1f1). Therefore, there should have fewer stop locations near U-Pump in the car GPS data.
 
-We can check the stop locations on day 13. On this day, there was one point near U-Pump where the stop time is near the consumption time in "U-Pump". The corresponding car id is 24. 
+We can check the stop locations on day 13 (all dots in Figure \@ref(fig:q2f1)). On this day, there was one point near U-Pump where the stop time is near the consumption time in "U-Pump". The corresponding car id is 24. 
 
-Thus, we think that Minke, the owner of car 24, use the credit card 9551. Let's draw the moving path of this car to discover more. All elements are draw in the same plot to enhance understanding
+Thus, we think that Minke, the owner of car 24, might use the credit card 9551. Let's draw the moving path of this car to discover more. The stops dots of car 24 are highlight into blue and the its drive path is also plotted with a blue line.
 
 ```{r q2f1, fig.cap="Stop Locations and Driving Path of Car 24 on Day 13", code_folding="Q2-Fig1 Code"}
 gps2_stop_day13 <- gps2_stop_sf %>% 
@@ -640,7 +640,8 @@ gps2_stop_days %>%
                       & start > "2014-01-18 13:00:00"
                       & end < "2014-01-18 16:00:00") %>% 
 knitr::kable(caption = "The Three Car Stop Near Kronos Mart") %>% 
-  kableExtra::kable_paper("hover", full_width=T)
+  kableExtra::kable_paper("hover", full_width=T) %>% 
+  kableExtra::scroll_box(width = "100%") 
 ```
 
 We can't get insights from the car owner information since they belong to different employment type. But they stayed at the same location for similar time period. They are very likely to meet each other and do the same thing. Besides, the consumption at 3 o'clock came from 3 credit cards and this meetup also involved in 3 persons.
