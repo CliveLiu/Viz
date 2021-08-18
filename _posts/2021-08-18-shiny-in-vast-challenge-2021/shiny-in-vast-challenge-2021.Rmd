@@ -1,0 +1,44 @@
+---
+title: "Shiny Apps for VAST Challenges 2021 MC2"
+description: |
+  A Dynamic and Interactive GeoTime Visualisation Dashboard for 2021 VAST Challenges 2
+author:
+  - name: TAN Choo Thye
+    url: https://funplaywdata06.netlify.app/
+    affiliation: School of Computing and Information Systems, Singapore Management University
+  - name: LIU Yangguang
+    url: https://www.linkedin.com/in/ygliu/
+    affiliation: School of Computing and Information Systems, Singapore Management University
+  - name: ZHONG Linli
+    url: https://linlizhong.netlify.app/
+    affiliation: School of Computing and Information Systems, Singapore Management University
+date: 08-18-2021
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - R
+  - R Shiny
+  - Visualization
+  - Interactive Charts
+preview: media/summary.png
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+We built an Shiny application to display an interactive visualization dashboard. This is a group project based on our individual assignments of VAST Challenges 2021. The designs of all graphs were from our assignments.
+
+The shiny apps were deployed on shinyapps.io, [click to view](https://ygliu.shinyapps.io/vast2021/). It might take a few minutes to load.
+
+This is our project poster.
+
+```{r, layout="l-body-outset"}
+knitr::include_graphics("media/poster.jpg")
+```
+
+For more information, you can view our [project website](https://vast2021.netlify.app/).
+
+

@@ -12,7 +12,22 @@
       <link>https://ygliu.netlify.app/</link>
     </image>
     <generator>Distill</generator>
-    <lastBuildDate>Sat, 31 Jul 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 18 Aug 2021 00:00:00 +0000</lastBuildDate>
+    <item>
+      <title>Shiny Apps for VAST Challenges 2021 MC2</title>
+      <dc:creator>TAN Choo Thye</dc:creator>
+      <dc:creator>LIU Yangguang</dc:creator>
+      <dc:creator>ZHONG Linli</dc:creator>
+      <link>https://ygliu.netlify.app/posts/2021-08-18-shiny-in-vast-challenge-2021</link>
+      <description>A Dynamic and Interactive GeoTime Visualisation Dashboard for 2021 VAST Challenges 2</description>
+      <category>R</category>
+      <category>R Shiny</category>
+      <category>Visualization</category>
+      <category>Interactive Charts</category>
+      <guid>https://ygliu.netlify.app/posts/2021-08-18-shiny-in-vast-challenge-2021</guid>
+      <pubDate>Wed, 18 Aug 2021 00:00:00 +0000</pubDate>
+      <media:content url="https://ygliu.netlify.app/posts/2021-08-18-shiny-in-vast-challenge-2021/media/summary.png" medium="image" type="image/png" width="1069" height="638"/>
+    </item>
     <item>
       <title>VAST Challenge 2021 MC2 (II)</title>
       <dc:creator>LIU Yangguang</dc:creator>

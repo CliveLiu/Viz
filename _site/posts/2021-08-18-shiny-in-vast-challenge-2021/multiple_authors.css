@@ -1,0 +1,5 @@
+/*  make the four elements into one line */
+/* 1fr or auto */
+d-byline .byline {
+  grid-template-columns: 1fr 3fr; 
+}
