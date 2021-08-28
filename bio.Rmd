@@ -14,8 +14,9 @@ output:
 ---
  
 ## BIO
+"The world’s most valuable resource is no longer oil, but data."
 
-The fortune of data never stop increasing and I keep learning to go further in this data journey. Currently studying in SMU, I upgrade my skill sets and persuade career as a good data analyst. 
+Currently studying in SMU, I upgrade my analytical skills & toolsets and persuade career as a good data analyst. I keep learning to explore more datasets and insights in this data journey.
 
 ## EDUCATION
 

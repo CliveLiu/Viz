@@ -7,9 +7,9 @@ css: media/about_page_header.css
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-This personal blog is updated with the coursework of Visual Analytics and Applications, taught by Professor [Kam Tin Seong](https://faculty.smu.edu.sg/profile/kam-tin-seong-486) at Singapore Management University. And in the future, it might also be updated with my other coursework and projects.
+This personal blog is updated with my coursework in Singapore Management University. Initially, it's built to display my assignments at the Visual Analytics and Applications, taught by Professor [Kam Tin Seong](https://faculty.smu.edu.sg/profile/kam-tin-seong-486). After this course, I decided to update posts about my other coursework and projects. Writing these public posts allows/drives me to revise and think deeper after coursework submission.
 
-The blog was built using [distill](https://rstudio.github.io/distill/) and [rmarkdown](https://rmarkdown.rstudio.com/), hosted on [netify](https://www.netlify.com/). A handy guide for creating a website can be found [here](https://lisalendway.netlify.app/posts/2020-12-09-buildingdistill/#customize-the-home-page).
+The blog was built using [distill](https://rstudio.github.io/distill/) and [rmarkdown](https://rmarkdown.rstudio.com/), hosted on [netify](https://www.netlify.com/). A handy guide for creating such a blog can be found [here](https://lisalendway.netlify.app/posts/2020-12-09-buildingdistill/#customize-the-home-page).
 
 The design of the blog was created with some graphics and CSS:
 

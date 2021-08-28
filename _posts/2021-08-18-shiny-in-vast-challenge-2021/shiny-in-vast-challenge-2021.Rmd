@@ -1,5 +1,5 @@
 ---
-title: "Shiny Apps for VAST Challenges 2021 MC2"
+title: "Web Apps for VAST Challenges 2021 MC2"
 description: |
   A Dynamic and Interactive GeoTime Visualisation Dashboard for 2021 VAST Challenges 2
 author:
@@ -29,16 +29,16 @@ preview: media/summary.png
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-We built an Shiny application to display an interactive visualization dashboard. This is a group project based on our individual assignments of VAST Challenges 2021. The designs of all graphs were from our assignments.
+This is a group project based on our individual assignments of VAST Challenges 2021. We built an Shiny web application to display an interactive visualization dashboard. The designs of all graphs were based on our assignments and aim to help readers fix questions in VAST Challenges 2021 MC2.
 
 The shiny apps were deployed on shinyapps.io, [click to view](https://ygliu.shinyapps.io/vast2021/). It might take a few minutes to load.
 
-This is our project poster.
+This is a project poster.
 
 ```{r, layout="l-body-outset"}
 knitr::include_graphics("media/poster.jpg")
 ```
 
-For more information, you can view our [project website](https://vast2021.netlify.app/).
+For more information, you can visit our [project website](https://vast2021.netlify.app/).
 
 
