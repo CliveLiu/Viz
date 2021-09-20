@@ -2420,6 +2420,34 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <script src="site_libs/webcomponents-2.0.0/webcomponents.js"></script>
   <script src="site_libs/distill-2.2.21/template.v2.js"></script>
   <!--radix_placeholder_site_in_header-->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      if (!/posts/.test(location.pathname)) {
+        return;
+      }
+
+      var script = document.createElement("script");
+      script.src = "https://utteranc.es/client.js";
+      script.setAttribute("repo", "CliveLiu/Viz");
+      script.setAttribute("issue-term", "og:title");
+      script.setAttribute("crossorigin", "anonymous");
+      script.setAttribute("label", "comment_thread");
+
+      /* wait for article to load, append script to article element */
+      var observer = new MutationObserver(function (mutations, observer) {
+        var article = document.querySelector("d-appendix");
+        if (article) {
+          observer.disconnect();
+          /* HACK: article scroll */
+          article.setAttribute("style", "overflow-y: hidden");
+          article.appendChild(script);
+        }
+      });
+
+      observer.observe(document.body, { childList: true });
+    });
+  </script>
+
   <!--/radix_placeholder_site_in_header-->
 
 
@@ -2639,7 +2667,7 @@ function init_posts_list() {
 <div class="publishedDate">July 23, 2021</div>
 </div>
 <div class="thumbnail">
-<img src="posts/2021-07-23-vast-challenge-2021-mc2/bkg.png"/>
+<img src="posts/2021-07-23-vast-challenge-2021-mc2/bkg2.png"/>
 </div>
 <div class="description">
 <h2>VAST Challenge 2021 MC2 (I)</h2>

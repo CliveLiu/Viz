@@ -2419,6 +2419,34 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <script src="site_libs/webcomponents-2.0.0/webcomponents.js"></script>
   <script src="site_libs/distill-2.2.21/template.v2.js"></script>
   <!--radix_placeholder_site_in_header-->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      if (!/posts/.test(location.pathname)) {
+        return;
+      }
+
+      var script = document.createElement("script");
+      script.src = "https://utteranc.es/client.js";
+      script.setAttribute("repo", "CliveLiu/Viz");
+      script.setAttribute("issue-term", "og:title");
+      script.setAttribute("crossorigin", "anonymous");
+      script.setAttribute("label", "comment_thread");
+
+      /* wait for article to load, append script to article element */
+      var observer = new MutationObserver(function (mutations, observer) {
+        var article = document.querySelector("d-appendix");
+        if (article) {
+          observer.disconnect();
+          /* HACK: article scroll */
+          article.setAttribute("style", "overflow-y: hidden");
+          article.appendChild(script);
+        }
+      });
+
+      observer.observe(document.body, { childList: true });
+    });
+  </script>
+
   <!--/radix_placeholder_site_in_header-->
 
   <link rel="stylesheet" href="media/about_page_header.css" type="text/css"/>
@@ -2471,9 +2499,9 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 
 
 <div class="d-article">
-<p>This personal blog is updated with my coursework in Singapore Management University. Initially, it’s built to display my assignments at the Visual Analytics and Applications, taught by Professor <a href="https://faculty.smu.edu.sg/profile/kam-tin-seong-486">Kam Tin Seong</a>. After this course, I decided to update posts about my other coursework and projects. Writing these public posts allows/drives me to revise and think deeper after coursework submission.</p>
-<p>The blog was built using <a href="https://rstudio.github.io/distill/">distill</a> and <a href="https://rmarkdown.rstudio.com/">rmarkdown</a>, hosted on <a href="https://www.netlify.com/">netify</a>. A handy guide for creating such a blog can be found <a href="https://lisalendway.netlify.app/posts/2020-12-09-buildingdistill/#customize-the-home-page">here</a>.</p>
-<p>The design of the blog was created with some graphics and CSS:</p>
+<p>This personal blog is updated with my coursework in Singapore Management University. Initially, it was built to upload my assignments at the Visual Analytics and Applications course, taught by Professor <a href="https://faculty.smu.edu.sg/profile/kam-tin-seong-486">Kam Tin Seong</a>. After this course, I decided to keep updating posts about my other coursework and projects. Writing these public posts allows &amp; drives me to revise and think deeper after the coursework submission.</p>
+<p>The blog was built using <a href="https://rstudio.github.io/distill/">distill</a> and <a href="https://rmarkdown.rstudio.com/">rmarkdown</a>, hosted on <a href="https://www.netlify.com/">netify</a>. A handy guide for creating such a blog can be found <a href="https://lisalendway.netlify.app/posts/2020-12-09-buildingdistill/e">here</a>.</p>
+<p>The blog design was created with following graphics and CSS:</p>
 <ul>
 <li><a href="https://rstudio.github.io/distill/website.html#example-themes">CSS Templates</a></li>
 <li><a href="https://slidesgo.com/theme/economics-thesis#search-economics&amp;position-0&amp;results-4">Illustration by Freepik Storyset</a></li>

@@ -7,11 +7,11 @@ css: media/about_page_header.css
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-This personal blog is updated with my coursework in Singapore Management University. Initially, it's built to display my assignments at the Visual Analytics and Applications, taught by Professor [Kam Tin Seong](https://faculty.smu.edu.sg/profile/kam-tin-seong-486). After this course, I decided to update posts about my other coursework and projects. Writing these public posts allows/drives me to revise and think deeper after coursework submission.
+This personal blog is updated with my coursework in Singapore Management University. Initially, it was built to upload my assignments at the Visual Analytics and Applications course, taught by Professor [Kam Tin Seong](https://faculty.smu.edu.sg/profile/kam-tin-seong-486). After this course, I decided to keep updating posts about my other coursework and projects. Writing these public posts allows & drives me to revise and think deeper after the coursework submission.
 
-The blog was built using [distill](https://rstudio.github.io/distill/) and [rmarkdown](https://rmarkdown.rstudio.com/), hosted on [netify](https://www.netlify.com/). A handy guide for creating such a blog can be found [here](https://lisalendway.netlify.app/posts/2020-12-09-buildingdistill/#customize-the-home-page).
+The blog was built using [distill](https://rstudio.github.io/distill/) and [rmarkdown](https://rmarkdown.rstudio.com/), hosted on [netify](https://www.netlify.com/). A handy guide for creating such a blog can be found [here](https://lisalendway.netlify.app/posts/2020-12-09-buildingdistill/e).
 
-The design of the blog was created with some graphics and CSS:
+The blog design was created with following graphics and CSS:
 
 * [CSS Templates](https://rstudio.github.io/distill/website.html#example-themes)
 * [Illustration by Freepik Storyset](https://slidesgo.com/theme/economics-thesis#search-economics&position-0&results-4) 

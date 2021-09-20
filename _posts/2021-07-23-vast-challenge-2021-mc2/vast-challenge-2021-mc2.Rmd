@@ -18,7 +18,7 @@ categories:
   - R
   - Visualization
   - Interactive Charts
-preview: bkg.png
+preview: bkg2.png
 ---
 
 
@@ -115,7 +115,8 @@ We have the consumption records of credit cards and loyalty cards.
 ```{r}
 loyalty <- read_csv("data/loyalty_data.csv", locale=locale(encoding ="windows-1252"))
 cc <- read_csv("data/cc_data.csv", locale=locale(encoding ="windows-1252"))
-# The location names contain some special characters, such as "Café", which are not recognized by utf-8 encoding. Thus, special encoding is used in reading data.
+# The location names contain some special characters, such as "Café", which are not 
+# recognized by utf-8 encoding. Thus, special encoding is used in reading data.
 ```
 
 
@@ -671,7 +672,7 @@ We can find that there are 44 employees, but 55 credit cards and 54 loyalty card
 
 --------------------------------------------------
 
-Interactive graphs consume a lot of time to load in the page, so this study is divided into two blogs.
+Pages with interactive graphs take long time to load, so this study is divided into two posts.
 
 
 **To be continued with [Part 2](https://ygliu.netlify.app/posts/2021-07-31-vast-challenge-2021-mc2-part2/).**

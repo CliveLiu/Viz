@@ -24,7 +24,10 @@ collections:
   posts:
     # categories: false # display category labels on post listing page
     authors_metadata: false # 'collections' disable to display authors
-    disqus: data-journery # display comment disqus: reproducible-finance-with-r
+    # disqus: data-journery # display comment disqus, but it has ads now
     citations: false # because base_url, the citation part in the article metadata will display by default
     share: [twitter, linkedin, facebook]
-output: distill::distill_article
+output: 
+  distill::distill_article:
+    includes:
+      in_header: media/utterances.html

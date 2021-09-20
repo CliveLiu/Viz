@@ -2442,6 +2442,34 @@ d-appendix d-footnote-list a.footnote-backlink {
   <script src="../../site_libs/webcomponents-2.0.0/webcomponents.js"></script>
   <script src="../../site_libs/distill-2.2.21/template.v2.js"></script>
   <!--radix_placeholder_site_in_header-->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (!/posts/.test(location.pathname)) {
+      return;
+    }
+
+    var script = document.createElement("script");
+    script.src = "https://utteranc.es/client.js";
+    script.setAttribute("repo", "CliveLiu/Viz");
+    script.setAttribute("issue-term", "og:title");
+    script.setAttribute("crossorigin", "anonymous");
+    script.setAttribute("label", "comment_thread");
+
+    /* wait for article to load, append script to article element */
+    var observer = new MutationObserver(function (mutations, observer) {
+      var article = document.querySelector("d-appendix");
+      if (article) {
+        observer.disconnect();
+        /* HACK: article scroll */
+        article.setAttribute("style", "overflow-y: hidden");
+        article.appendChild(script);
+      }
+    });
+
+    observer.observe(document.body, { childList: true });
+  });
+</script>
+
 <!--/radix_placeholder_site_in_header-->
 
 
@@ -3436,11 +3464,6 @@ Name: rate_code_group, dtype: int64</code></pre>
 <!--radix_placeholder_article_footer-->
 <div class="article-footer">
   <p class="social_footer">
-    <span class="disqus-comments">
-      <i class="fas fa-comments"></i>
-      &nbsp;
-      <span class="disqus-comment-count" data-disqus-identifier="posts/2021-07-02-nyc-taxi-tip-prediction/">Comment on this article</span>
-    </span>
     <span class="article-sharing">
       Share: &nbsp;
       <a href="https://twitter.com/share?text=What%20Factors%20Will%20Influence%20Taxi%20Tipping&amp;url=https%3A%2F%2Fygliu.netlify.app%2Fposts%2F2021-07-02-nyc-taxi-tip-prediction%2F">
@@ -3454,20 +3477,6 @@ Name: rate_code_group, dtype: int64</code></pre>
       </a>
     </span>
   </p>
-  <script id="dsq-count-scr" src="https://data-journery.disqus.com/count.js" async></script>
-  <div id="disqus_thread" class="hidden"></div>
-  <script type="text/javascript" cookie-consent="functionality">
-var disqus_config = function () {
-  this.page.url = 'https://ygliu.netlify.app/posts/2021-07-02-nyc-taxi-tip-prediction/';
-  this.page.identifier = 'posts/2021-07-02-nyc-taxi-tip-prediction/';
-};
-(function() {
-  var d = document, s = d.createElement('script');
-  s.src = 'https://data-journery.disqus.com/embed.js';
-  s.setAttribute('data-timestamp', +new Date());
-  (d.head || d.body).appendChild(s);
-})();
-</script>
 </div>
 <!--/radix_placeholder_article_footer-->
 </div>
